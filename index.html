@@ -314,6 +314,103 @@ tr.fav .linha-time .nm{color:var(--gold)}
 }
 .trocar:hover{color:var(--text);border-color:var(--muted)}
 
+/* ---------- administração ---------- */
+.adm-topo{
+  display:flex;align-items:center;gap:10px;padding:16px 0 12px;
+  border-bottom:1px solid var(--line-solid);margin-bottom:4px;
+}
+.adm-topo h1{font-size:16px;font-weight:800;margin:0;letter-spacing:-.02em}
+.adm-topo .tag{
+  font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--laranja);border:1px solid rgba(238,139,45,.4);border-radius:999px;padding:2px 8px;
+}
+.adm-acao{
+  margin-left:auto;font-size:13px;font-weight:600;color:var(--faint);
+}
+.adm-acao:hover{color:var(--text)}
+
+.campo{display:block;margin:16px 0 0}
+.campo label{
+  display:block;font-size:11px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--faint);margin-bottom:6px;
+}
+.campo input,.campo select{
+  width:100%;padding:11px 12px;font:inherit;font-size:15px;color:var(--text);
+  background:var(--surface);border:1px solid var(--line-solid);border-radius:8px;
+}
+.campo input:focus,.campo select:focus{outline:2px solid var(--red);outline-offset:1px}
+.campo .dica{font-size:12px;color:var(--faint);margin-top:6px;line-height:1.45}
+.campo .dica a{color:var(--muted)}
+
+.btn{
+  display:block;width:100%;margin-top:18px;padding:13px;border-radius:8px;
+  font-size:14px;font-weight:700;letter-spacing:.02em;
+  background:var(--red);color:#fff;border:1px solid var(--red);
+}
+.btn:disabled{opacity:.45}
+.btn.secundario{background:none;color:var(--muted);border-color:var(--line-solid);font-weight:600}
+.btn.secundario:hover{color:var(--text);border-color:var(--muted)}
+
+.adm-item{
+  display:flex;align-items:center;gap:10px;width:100%;text-align:left;
+  padding:12px 2px;border-bottom:1px solid var(--line);
+}
+.adm-item .quem{flex:1;min-width:0;font-size:14px;font-weight:600;line-height:1.3}
+.adm-item .quando{font-size:11.5px;color:var(--faint);font-weight:500}
+.adm-item .est{
+  font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  padding:3px 8px;border-radius:999px;flex:none;
+}
+.adm-item .est.aberto{color:var(--faint);border:1px solid var(--line-solid)}
+.adm-item .est.pronto{color:var(--red);background:var(--red-soft)}
+
+.stepper{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:8px}
+.stepper button{
+  width:40px;height:40px;border-radius:50%;border:1px solid var(--line-solid);
+  font-size:20px;font-weight:700;line-height:1;color:var(--muted);
+}
+.stepper button:hover{color:var(--text);border-color:var(--muted)}
+.stepper .n{
+  font-size:30px;font-weight:800;font-variant-numeric:tabular-nums;
+  min-width:40px;text-align:center;letter-spacing:-.03em;
+}
+.lado-edit{display:flex;flex-direction:column;align-items:center;gap:8px;flex:1;min-width:0;text-align:center}
+.lado-edit img{width:46px;height:46px;border-radius:50%}
+.lado-edit .nm{font-size:13px;font-weight:600;line-height:1.25}
+
+.alternar{display:flex;gap:8px;margin-top:8px}
+.alternar button{
+  flex:1;padding:11px;border-radius:8px;border:1px solid var(--line-solid);
+  font-size:13.5px;font-weight:600;color:var(--faint);
+}
+.alternar button[aria-pressed="true"]{background:var(--red);border-color:var(--red);color:#fff;font-weight:700}
+
+.gol-linha{
+  display:flex;align-items:center;gap:10px;padding:11px 2px;
+  border-bottom:1px solid var(--line);
+}
+.gol-linha img{width:22px;height:22px;border-radius:50%;flex:none}
+.gol-linha .txt{flex:1;min-width:0}
+.gol-linha .a{font-size:14px;font-weight:600;line-height:1.3}
+.gol-linha .b{font-size:12px;color:var(--faint);line-height:1.35}
+.gol-linha .tirar{color:var(--faint);font-size:20px;line-height:1;padding:0 6px}
+.gol-linha .tirar:hover{color:var(--red)}
+
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{
+  border:1px solid var(--line-solid);border-radius:999px;padding:5px 11px;
+  font-size:12.5px;font-weight:600;color:var(--muted);
+}
+.chip:hover{border-color:var(--muted);color:var(--text)}
+
+.aviso-adm{
+  margin-top:14px;padding:11px 13px;border-radius:8px;font-size:12.5px;line-height:1.5;
+  background:var(--laranja-fraco);color:var(--muted);border-left:2px solid var(--laranja);
+}
+.aviso-adm.erro{background:var(--red-soft);border-left-color:var(--red)}
+.aviso-adm.ok{background:rgba(53,199,127,.1);border-left-color:#35C77F}
+.aviso-adm b{color:var(--text);font-weight:600}
+
 /* ---------- pódio ---------- */
 .podio{display:flex;align-items:center;gap:13px;padding:15px 0;border-bottom:1px solid var(--line)}
 .podio .rot{font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;width:62px;flex:none;color:var(--faint)}
@@ -584,6 +681,7 @@ function simulacao(){
 const CHAVE = "copa-rino-turma";
 let favorita = null;
 let reais = [];
+let ELENCOS = {};   // nomes já usados por time, para virarem atalho no admin
 let aba = "jogos";
 let faseView = "grupos";
 let anoView = EDICAO_ATUAL;
@@ -592,6 +690,13 @@ let telaJogo = null;
 let pilha = [];
 let menuAberto = false;
 let jaRolou = false;
+
+/* administração (tela #admin, mais abaixo) — declarado aqui porque a
+   escolha de turma, que vem antes, já consulta modoAdmin */
+let modoAdmin = false;
+let admJogo = null;      // id do jogo aberto para edição
+let admAviso = null;     // {tipo, texto}
+let admSalvando = false;
 
 try { favorita = localStorage.getItem(CHAVE) || null; } catch (e) {}
 if (favorita && !timeDe(favorita)) favorita = null;
@@ -1060,6 +1165,12 @@ function viewMeuTime(){
 /* ---------- render ---------- */
 function render(){
   const main = document.getElementById("main");
+  document.getElementById("tabbar").hidden = modoAdmin;
+  if (modoAdmin){
+    document.getElementById("onboarding").hidden = true;
+    main.innerHTML = viewAdmin();
+    return;
+  }
   if (telaJogo) main.innerHTML = viewPartida();
   else if (aba === "jogos") main.innerHTML = viewJogos();
   else if (aba === "classificacao") main.innerHTML = viewClassificacao();
@@ -1171,7 +1282,357 @@ document.getElementById("grade-escolha").addEventListener("click", ev => {
   telaTime = null; overlay.hidden = true; render();
 });
 document.getElementById("btn-pular").addEventListener("click", () => { overlay.hidden = true; render(); });
-if (!favorita) overlay.hidden = false;
+if (!favorita && !modoAdmin) overlay.hidden = false;
+
+/* ============================================================
+   ADMINISTRAÇÃO — abre em #admin, não aparece em nenhum menu
+   ------------------------------------------------------------
+   Grava direto no dados.json do repositório, pela API do GitHub.
+   O token fica só no navegador de quem administra (localStorage),
+   nunca no código publicado. Qualquer pessoa consegue abrir esta
+   tela; sem token, ninguém consegue salvar nada — a trava é o
+   token, não o endereço.
+
+   Para trocar por Firebase depois, o que muda é só gravarRemoto().
+   ============================================================ */
+
+const CHAVE_GH = "copa-rino-gh";
+
+function ghConfig(){
+  try { return JSON.parse(localStorage.getItem(CHAVE_GH) || "null") || {}; }
+  catch (e) { return {}; }
+}
+function ghGuardar(cfg){
+  try { localStorage.setItem(CHAVE_GH, JSON.stringify(cfg)); } catch (e) {}
+}
+function ghEsquecer(){
+  try { localStorage.removeItem(CHAVE_GH); } catch (e) {}
+}
+
+/* o próprio endereço já diz o repositório quando está no GitHub Pages */
+function repoDoEndereco(){
+  const h = location.hostname, partes = location.pathname.split("/").filter(Boolean);
+  if (h.endsWith(".github.io")) return {owner: h.split(".")[0], repo: partes[0] || ""};
+  return {owner: "", repo: ""};
+}
+
+const paraB64 = txt => {
+  const bytes = new TextEncoder().encode(txt);
+  let bin = "";
+  bytes.forEach(b => { bin += String.fromCharCode(b); });
+  return btoa(bin);
+};
+const deB64 = b64 => new TextDecoder().decode(
+  Uint8Array.from(atob(b64.replace(/\s/g, "")), c => c.charCodeAt(0)));
+
+async function ghArquivo(){
+  const {owner, repo, token} = ghConfig();
+  const r = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/dados.json`, {
+    headers: {Authorization: "Bearer " + token, Accept: "application/vnd.github+json"},
+    cache: "no-store",
+  });
+  if (!r.ok) throw new Error(r.status === 401 || r.status === 403
+    ? "Token recusado pelo GitHub. Confira se ele tem permissão de escrita neste repositório."
+    : r.status === 404 ? "Repositório ou arquivo dados.json não encontrado."
+    : "GitHub respondeu " + r.status);
+  const j = await r.json();
+  return {doc: JSON.parse(deB64(j.content)), sha: j.sha};
+}
+
+async function gravarRemoto(doc, sha, mensagem){
+  const {owner, repo, token} = ghConfig();
+  const r = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/dados.json`, {
+    method: "PUT",
+    headers: {Authorization: "Bearer " + token, Accept: "application/vnd.github+json",
+              "Content-Type": "application/json"},
+    body: JSON.stringify({
+      message: mensagem,
+      content: paraB64(JSON.stringify(doc, null, 2) + "\n"),
+      sha,
+    }),
+  });
+  if (!r.ok){
+    const t = await r.text().catch(() => "");
+    throw new Error(r.status === 409
+      ? "O arquivo mudou no GitHub enquanto você editava. Abra a tela de novo e refaça este lançamento."
+      : "Não consegui salvar (GitHub " + r.status + "). " + t.slice(0, 120));
+  }
+}
+
+/* ---------- entrada: configurar o acesso ---------- */
+function viewAdminAcesso(){
+  const cfg = ghConfig(), sug = repoDoEndereco();
+  return `${cabecalhoAdmin("Acesso")}
+    <p class="campo dica" style="margin-top:14px">Esta tela grava direto no repositório do app. Ela pede um token do GitHub com permissão de escrita — ele fica guardado só neste celular.</p>
+    <label class="campo"><span>Usuário ou organização</span>
+      <input id="adm-owner" value="${esc(cfg.owner || sug.owner)}" autocapitalize="off" autocorrect="off" spellcheck="false"></label>
+    <label class="campo"><span>Repositório</span>
+      <input id="adm-repo" value="${esc(cfg.repo || sug.repo)}" autocapitalize="off" autocorrect="off" spellcheck="false"></label>
+    <label class="campo"><span>Token</span>
+      <input id="adm-token" type="password" value="" placeholder="github_pat_..." autocapitalize="off" autocorrect="off" spellcheck="false">
+      <span class="dica">No GitHub: Settings → Developer settings → Personal access tokens → Fine-grained. Dê acesso só a este repositório, com <b>Contents: Read and write</b>. Guarde o token em algum lugar — o GitHub só mostra uma vez.</span></label>
+    <button class="btn" id="adm-entrar">Salvar acesso</button>
+    ${cfg.token ? `<button class="btn secundario" id="adm-sair">Esquecer o token deste aparelho</button>` : ""}
+    ${admAviso ? `<div class="aviso-adm ${admAviso.tipo}">${admAviso.texto}</div>` : ""}`;
+}
+
+const cabecalhoAdmin = (titulo) => `<div class="adm-topo">
+    <h1>${esc(titulo)}</h1><span class="tag">Admin</span>
+    <button class="adm-acao" id="adm-fechar">Sair</button>
+  </div>`;
+
+/* ---------- lista de jogos ---------- */
+function viewAdminLista(){
+  const lista = ordenadas(jogos());
+  let html = cabecalhoAdmin("Lançar resultados");
+  if (admAviso) html += `<div class="aviso-adm ${admAviso.tipo}">${admAviso.texto}</div>`;
+
+  let faseAtual = null;
+  lista.forEach(m => {
+    const rot = m.fase === "grupos" ? "Rodada " + (m.rodada || "?") : faseNome(m.fase);
+    if (rot !== faseAtual){ faseAtual = rot; html += `<div class="rodada">${esc(rot)}</div>`; }
+    const c = timeDe(m.casa), f = timeDe(m.fora);
+    const [pc, pf] = placar(m);
+    const nome = t => t ? t.turma : "?";
+    html += `<button class="adm-item" data-adm-jogo="${esc(chaveJogo(m))}">
+      <span class="quem">${nome(c)} × ${nome(f)}
+        <span class="quando" style="display:block">${esc(hora(m.dataHora))} · ${esc(m.local || "")}</span></span>
+      <span class="est ${encerrado(m) ? "pronto" : "aberto"}">${
+        encerrado(m) ? `${pc}-${pf}` : "a jogar"}</span>
+    </button>`;
+  });
+  html += `<button class="btn secundario" id="adm-config">Trocar o acesso do GitHub</button>`;
+  return html;
+}
+
+/* ---------- edição de um jogo ---------- */
+function viewAdminJogo(){
+  const m = jogos().find(x => chaveJogo(x) === admJogo);
+  if (!m) return viewAdminLista();
+  const c = timeDe(m.casa), f = timeDe(m.fora);
+  const gols = Array.isArray(m.gols) ? m.gols : [];
+  const gc = Number(m.golsCasa) || 0, gf = Number(m.golsFora) || 0;
+  const fim = encerrado(m);
+
+  const seletor = (lado, atual, rotulo) => `
+    <label class="campo" style="margin-top:0"><span>${esc(rotulo || "Time")}</span>
+      <select data-adm-time="${lado}">
+        <option value="">— escolher —</option>
+        ${TIMES.map(t => `<option value="${t.id}" ${t.id === atual ? "selected" : ""}>${esc(t.turma)} · ${esc(t.nome)}</option>`).join("")}
+      </select></label>`;
+
+  const ladoEdit = (t, lado, rotulo, n) => t
+    ? `<div class="lado-edit">
+        <img src="${escudo(t.id)}" alt="" width="46" height="46">
+        <div class="nm">${esc(t.nome)}</div>
+        <div class="stepper">
+          <button data-adm-gol="-${lado}" aria-label="Tirar um gol">−</button>
+          <span class="n">${n}</span>
+          <button data-adm-gol="+${lado}" aria-label="Somar um gol">+</button>
+        </div>
+      </div>`
+    : `<div class="lado-edit" style="align-self:stretch">${seletor(lado, null, rotulo)}</div>`;
+
+  const nomesDoTime = id => (ELENCOS[id] || []);
+
+  let html = cabecalhoAdmin(m.fase === "grupos" ? "Rodada " + m.rodada : faseNome(m.fase));
+  html += `<button class="voltar" id="adm-voltar"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>Todos os jogos</button>
+    <div style="display:flex;align-items:flex-start;gap:14px;padding:16px 0 4px">
+      ${ladoEdit(c, "casa", criterioCurto(m.casaRotulo), gc)}
+      ${ladoEdit(f, "fora", criterioCurto(m.foraRotulo), gf)}
+    </div>`;
+
+  if (c && f){
+    html += `<div class="campo"><label>Situação</label>
+      <div class="alternar">
+        <button data-adm-status="agendado" aria-pressed="${!fim}">Ainda vai jogar</button>
+        <button data-adm-status="encerrado" aria-pressed="${fim}">Jogo encerrado</button>
+      </div>
+      <span class="dica">O placar só aparece no app depois de marcar como encerrado.</span></div>
+
+      <div class="rodada" style="margin-top:22px">Gols</div>
+      ${gols.length ? gols.map((g, i) => {
+        const t = timeDe(g.time);
+        return `<div class="gol-linha">
+          ${t ? `<img src="${escudo(t.id)}" alt="" width="22" height="22">` : ""}
+          <span class="txt"><span class="a">${esc(g.jogador || "Sem autor")}</span>
+            ${g.assistencia ? `<span class="b">assistência de ${esc(g.assistencia)}</span>` : ""}</span>
+          <button class="tirar" data-adm-tirar="${i}" aria-label="Remover gol">×</button>
+        </div>`;
+      }).join("") : `<p class="campo dica" style="margin-top:8px">Nenhum gol lançado. Se não quiser registrar quem marcou, basta usar os botões de + e − no placar.</p>`}
+
+      ${[["casa", c], ["fora", f]].map(([lado, t]) => `
+        <div class="campo">
+          <label>Gol do ${esc(t.nome)}</label>
+          <input id="adm-nome-${lado}" placeholder="Quem marcou" list="nomes-${lado}" autocapitalize="words">
+          <datalist id="nomes-${lado}">${nomesDoTime(t.id).map(n => `<option value="${esc(n)}"></option>`).join("")}</datalist>
+          ${nomesDoTime(t.id).length ? `<div class="chips">${nomesDoTime(t.id).slice(0, 8).map(n =>
+            `<button class="chip" data-adm-chip="${lado}" data-nome="${esc(n)}">${esc(n)}</button>`).join("")}</div>` : ""}
+          <button class="btn secundario" data-adm-add="${lado}" style="margin-top:10px">Adicionar gol</button>
+        </div>`).join("")}
+
+      ${gols.length > gc + gf ? `<div class="aviso-adm">Há mais gols lançados do que o placar indica. O placar manda: confira os números acima.</div>` : ""}
+
+      <button class="btn" id="adm-salvar" ${admSalvando ? "disabled" : ""}>${admSalvando ? "Salvando…" : "Salvar no app"}</button>`;
+  } else {
+    html += `<div class="aviso-adm">Escolha os dois times deste confronto para poder lançar o placar.</div>
+      <button class="btn" id="adm-salvar" ${admSalvando ? "disabled" : ""}>${admSalvando ? "Salvando…" : "Salvar times"}</button>`;
+  }
+
+  if (admAviso) html += `<div class="aviso-adm ${admAviso.tipo}">${admAviso.texto}</div>`;
+  return html;
+}
+
+function viewAdmin(){
+  const cfg = ghConfig();
+  if (!cfg.token || !cfg.owner || !cfg.repo) return viewAdminAcesso();
+  return admJogo ? viewAdminJogo() : viewAdminLista();
+}
+
+/* ---------- salvar ---------- */
+async function admSalvar(){
+  const m = jogos().find(x => chaveJogo(x) === admJogo);
+  if (!m || admSalvando) return;
+  admSalvando = true; admAviso = null; render();
+  try {
+    const {doc, sha} = await ghArquivo();
+    const alvo = (doc.partidas || []).find(p => (p.id || chaveJogo(p)) === admJogo);
+    if (!alvo) throw new Error("Esta partida não está no dados.json do repositório.");
+
+    alvo.casa = m.casa; alvo.fora = m.fora;
+    alvo.status = m.status;
+    alvo.golsCasa = m.golsCasa; alvo.golsFora = m.golsFora;
+    alvo.gols = Array.isArray(m.gols) ? m.gols : [];
+
+    /* guarda os nomes já usados para virarem atalho da próxima vez */
+    doc.elencos = doc.elencos || {};
+    alvo.gols.forEach(g => {
+      if (!g.time || !g.jogador) return;
+      const lista = doc.elencos[g.time] = doc.elencos[g.time] || [];
+      if (!lista.includes(g.jogador)) lista.push(g.jogador);
+    });
+    doc.atualizadoEm = new Date().toISOString();
+
+    const c = timeDe(alvo.casa), f = timeDe(alvo.fora);
+    await gravarRemoto(doc, sha,
+      `Resultado: ${c ? c.turma : "?"} ${alvo.golsCasa ?? "-"} x ${alvo.golsFora ?? "-"} ${f ? f.turma : "?"}`);
+
+    ELENCOS = doc.elencos;
+    admAviso = {tipo:"ok", texto:"<b>Salvo.</b> O GitHub republica em cerca de um minuto e o app de todo mundo se atualiza sozinho."};
+    admJogo = null;
+  } catch (e){
+    admAviso = {tipo:"erro", texto: esc(e.message || "Não consegui salvar.")};
+  }
+  admSalvando = false;
+  render();
+}
+
+/* ---------- eventos da administração ---------- */
+function ligarAdmin(){
+  const main = document.getElementById("main");
+
+  main.addEventListener("click", ev => {
+    if (!modoAdmin) return;
+
+    if (ev.target.closest("#adm-fechar")){ location.hash = ""; return; }
+    if (ev.target.closest("#adm-voltar")){ admJogo = null; admAviso = null; render(); return; }
+    if (ev.target.closest("#adm-config")){ admJogo = null; admAviso = null; ghGuardar({...ghConfig(), token:""}); render(); return; }
+    if (ev.target.closest("#adm-sair")){ ghEsquecer(); admAviso = {tipo:"ok", texto:"Token apagado deste aparelho."}; render(); return; }
+
+    if (ev.target.closest("#adm-entrar")){
+      const owner = document.getElementById("adm-owner").value.trim();
+      const repo  = document.getElementById("adm-repo").value.trim();
+      const token = document.getElementById("adm-token").value.trim();
+      if (!owner || !repo || !token){ admAviso = {tipo:"erro", texto:"Preencha os três campos."}; render(); return; }
+      ghGuardar({owner, repo, token});
+      admAviso = null; render();
+      return;
+    }
+
+    const abrir = ev.target.closest("[data-adm-jogo]");
+    if (abrir){ admJogo = abrir.dataset.admJogo; admAviso = null;
+      main.scrollTop = 0; render(); return; }
+
+    const m = jogos().find(x => chaveJogo(x) === admJogo);
+    if (!m) return;
+    /* a partir da primeira edição os dois lados são números: um lado nulo
+       faria o app cair na contagem dos gols e mostrar placar diferente */
+    const numerar = () => {
+      if (m.golsCasa == null) m.golsCasa = 0;
+      if (m.golsFora == null) m.golsFora = 0;
+    };
+
+    const passo = ev.target.closest("[data-adm-gol]");
+    if (passo){
+      numerar();
+      const [sinal, lado] = [passo.dataset.admGol[0], passo.dataset.admGol.slice(1)];
+      const campo = lado === "casa" ? "golsCasa" : "golsFora";
+      const atual = Number(m[campo]) || 0;
+      m[campo] = Math.max(0, atual + (sinal === "+" ? 1 : -1));
+      if (sinal === "-"){
+        const idTime = lado === "casa" ? m.casa : m.fora;
+        const i = (m.gols || []).map(g => g.time).lastIndexOf(idTime);
+        if (i >= 0 && (m.gols.filter(g => g.time === idTime).length > m[campo])) m.gols.splice(i, 1);
+      }
+      if (m.golsCasa != null && m.golsFora != null && m.status !== "encerrado") m.status = "encerrado";
+      render(); return;
+    }
+
+    const est = ev.target.closest("[data-adm-status]");
+    if (est){
+      m.status = est.dataset.admStatus;
+      if (m.status === "encerrado") numerar();
+      render(); return;
+    }
+
+    const chip = ev.target.closest("[data-adm-chip]");
+    if (chip){
+      const campo = document.getElementById("adm-nome-" + chip.dataset.admChip);
+      if (campo) campo.value = chip.dataset.nome;
+      return;
+    }
+
+    const add = ev.target.closest("[data-adm-add]");
+    if (add){
+      const lado = add.dataset.admAdd;
+      const campo = document.getElementById("adm-nome-" + lado);
+      const nome = (campo.value || "").trim();
+      if (!nome){ campo.focus(); return; }
+      numerar();
+      m.gols = Array.isArray(m.gols) ? m.gols : [];
+      m.gols.push({time: lado === "casa" ? m.casa : m.fora, jogador: nome});
+      campo.value = "";
+      const alvo = lado === "casa" ? "golsCasa" : "golsFora";
+      m[alvo] = (Number(m[alvo]) || 0) + 1;
+      if (m.status !== "encerrado") m.status = "encerrado";
+      render(); return;
+    }
+
+    const tirar = ev.target.closest("[data-adm-tirar]");
+    if (tirar){
+      const i = Number(tirar.dataset.admTirar);
+      const g = (m.gols || [])[i];
+      if (g){
+        const alvo = g.time === m.casa ? "golsCasa" : "golsFora";
+        m[alvo] = Math.max(0, (Number(m[alvo]) || 0) - 1);
+        m.gols.splice(i, 1);
+      }
+      render(); return;
+    }
+
+    if (ev.target.closest("#adm-salvar")){ admSalvar(); return; }
+  });
+
+  main.addEventListener("change", ev => {
+    if (!modoAdmin) return;
+    const sel = ev.target.closest("[data-adm-time]");
+    if (!sel) return;
+    const m = jogos().find(x => chaveJogo(x) === admJogo);
+    if (!m) return;
+    m[sel.dataset.admTime === "casa" ? "casa" : "fora"] = sel.value || null;
+    render();
+  });
+}
 
 /* ============================================================
    FONTE DOS DADOS
@@ -1190,6 +1651,18 @@ if (!favorita) overlay.hidden = false;
 
 const FONTE_REMOTA = "";
 
+function lerHash(){
+  const novo = location.hash === "#admin";
+  if (novo !== modoAdmin){ modoAdmin = novo; admJogo = null; admAviso = null; }
+}
+window.addEventListener("hashchange", () => {
+  lerHash();
+  document.getElementById("main").scrollTop = 0;
+  render();
+});
+lerHash();
+ligarAdmin();
+
 function aplicar(lista){
   reais = Array.isArray(lista) ? lista : [];
   jaRolou = false;
@@ -1202,6 +1675,7 @@ async function lerArquivo(){
     const r = await fetch(url, {cache:"no-store"});
     if (!r.ok) return;
     const d = await r.json();
+    ELENCOS = d.elencos || {};
     aplicar(d.partidas);
   } catch (e) { /* offline: segue com o que já está na tela */ }
 }

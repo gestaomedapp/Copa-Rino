@@ -78,6 +78,58 @@ Enquanto `partidas` estiver vazio, o app mostra uma simulação da fase de
 grupos, sinalizada na tela com uma faixa vermelha. A faixa some sozinha no
 instante em que a primeira partida de verdade for gravada.
 
+## Tela de administração (lançar placares e gols)
+
+Endereço: o do app com `#admin` no fim —
+`https://SEU-USUARIO.github.io/Copa-Rino/#admin`
+
+Ela não aparece em nenhum menu, mas também não é secreta: qualquer pessoa que
+souber o endereço consegue abrir. **A trava é o token, não o endereço** — sem
+ele não dá para salvar nada.
+
+### Criar o token (uma vez só)
+
+1. No GitHub: **Settings → Developer settings → Personal access tokens →
+   Fine-grained tokens → Generate new token**.
+2. Em *Repository access*, escolha **Only select repositories** e marque só o
+   `Copa-Rino`.
+3. Em *Permissions → Repository permissions*, ache **Contents** e ponha
+   **Read and write**. Só isso.
+4. Em *Expiration*, escolha uma data curta — uma semana já basta para a copa.
+5. Gere e **copie o token na hora**: o GitHub só mostra uma vez.
+
+Abra `#admin` no celular, preencha usuário, repositório e token, e salve. O
+token fica guardado só naquele aparelho.
+
+### No dia
+
+Toque no jogo, ajuste o placar com **+** e **−**, e digite quem marcou. Cada
+gol lançado já soma um no placar, então não precisa fazer as duas coisas. O
+jogo vira "encerrado" sozinho no primeiro lançamento — é o que libera o placar
+para aparecer no app.
+
+Os nomes ficam guardados por time: do segundo gol do mesmo jogador em diante,
+ele aparece como atalho para tocar em vez de digitar.
+
+Nos jogos do mata-mata, enquanto o confronto não existe aparecem dois campos
+para escolher os times. Depois de escolhidos, a tela fica igual às outras.
+
+**Salvar** manda um commit para o repositório. Em cerca de um minuto o GitHub
+republica e o app de todo mundo se atualiza sozinho — ninguém precisa fechar e
+abrir.
+
+### Se der errado
+
+- *Token recusado*: confira se ele tem **Contents: Read and write** e se está
+  marcado para este repositório. Token vencido dá o mesmo erro.
+- *O arquivo mudou no GitHub*: alguém editou o `dados.json` no meio do
+  caminho. Saia e entre de novo na tela e refaça aquele lançamento.
+- **Perdeu o celular?** Vá no GitHub, em *Personal access tokens*, e apague o
+  token. Ele para de funcionar na hora.
+
+Dentro da pré-visualização do Claude essa tela abre, mas não salva — o
+navegador do Claude bloqueia chamadas ao GitHub. Use no endereço de verdade.
+
 ## Se um dia quiserem resultado mais rápido
 
 Editar o `dados.json` pelo GitHub leva cerca de um minuto até o ar. Para
@@ -92,7 +144,7 @@ muda.
 ## Ao mexer no código do app
 
 Se editar `index.html`, `sw.js` ou os escudos, troque o número em
-`const VERSAO = "copa-rino-v5"` no `sw.js` (v2, v3...). Sem isso, quem já tem o
+`const VERSAO = "copa-rino-v11"` no `sw.js` (v2, v3...). Sem isso, quem já tem o
 app instalado continua vendo a versão antiga, guardada no cache.
 
 Trocar só o `dados.json` não exige isso — ele nunca é servido do cache.
