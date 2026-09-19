@@ -318,6 +318,53 @@ tr.fav .linha-time .nm{color:var(--gold)}
 .resumo .v{font-size:19px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1}
 .resumo .k{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-top:5px;font-weight:600}
 .sec{margin:26px 0 2px;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);display:flex}
+
+/* ---------- elenco e rankings ---------- */
+.elenco-linha{
+  display:flex;align-items:center;gap:11px;padding:11px 0;
+  border-bottom:1px solid var(--line);
+}
+.elenco-linha:last-child{border-bottom:none}
+.elenco-linha .num-camisa{
+  font-size:12px;font-weight:700;color:var(--faint);width:22px;flex:none;
+  text-align:center;font-variant-numeric:tabular-nums;
+}
+.elenco-linha img{width:26px;height:26px;border-radius:50%;flex:none}
+.elenco-linha .quem{flex:1;min-width:0}
+.elenco-linha .quem .a{
+  display:block;max-width:100%;
+  font-size:14.5px;font-weight:600;color:var(--text);line-height:1.25;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.elenco-linha .quem .b{
+  display:block;max-width:100%;
+  font-size:11.5px;color:var(--faint);line-height:1.35;font-weight:500;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.elenco-linha .marca-gols{
+  font-size:13px;font-weight:700;color:var(--text);flex:none;
+  font-variant-numeric:tabular-nums;display:flex;align-items:center;gap:5px;
+}
+.elenco-linha .marca-gols.zero{color:var(--faint);font-weight:500}
+.elenco-linha .marca-gols svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5;opacity:.7}
+.elenco-linha.lider .quem .a{color:var(--gold)}
+
+.destaque-cartao{
+  display:flex;align-items:center;gap:13px;margin-top:16px;padding:14px;
+  background:var(--surface);border:1px solid var(--line-solid);border-radius:10px;
+}
+.destaque-cartao img{width:44px;height:44px;border-radius:50%;flex:none}
+.destaque-cartao .rot{
+  font-size:10px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:3px;
+}
+.destaque-cartao .nm{font-size:17px;font-weight:800;letter-spacing:-.02em;line-height:1.15}
+.destaque-cartao .sub{font-size:12px;color:var(--faint);font-weight:500;margin-top:2px}
+.destaque-cartao .big{
+  margin-left:auto;text-align:center;flex:none;
+}
+.destaque-cartao .big .v{font-size:26px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.03em}
+.destaque-cartao .big .k{font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-top:4px;font-weight:600}
 .sec .hint{margin-left:auto;letter-spacing:0;text-transform:none;font-weight:500;color:var(--faint);font-size:12px}
 .trocar{
   display:block;width:100%;margin-top:30px;padding:13px;border:1px solid var(--line-solid);
@@ -704,6 +751,7 @@ let reais = [];
 let ELENCOS = {};   // nomes já usados por time, para virarem atalho no admin
 let aba = "jogos";
 let faseView = "grupos";
+let perfilAba = "geral";   // aba dentro do perfil do time: geral | elenco
 let anoView = EDICAO_ATUAL;
 let telaTime = null;
 let telaJogo = null;
@@ -731,10 +779,11 @@ function salvarFavorita(id){
 
 /* ---------- navegação ---------- */
 function navegar(novo){
-  pilha.push({aba, telaTime, telaJogo, faseView, anoView});
+  pilha.push({aba, telaTime, telaJogo, faseView, anoView, perfilAba});
   aba = novo.aba != null ? novo.aba : aba;
   telaTime = novo.telaTime != null ? novo.telaTime : null;
   telaJogo = novo.telaJogo != null ? novo.telaJogo : null;
+  perfilAba = "geral";
   document.getElementById("main").scrollTop = 0;
   jaRolou = true;
   render();
@@ -743,7 +792,7 @@ function voltar(){
   const p = pilha.pop();
   if (!p) return;
   aba = p.aba; telaTime = p.telaTime; telaJogo = p.telaJogo;
-  faseView = p.faseView; anoView = p.anoView;
+  faseView = p.faseView; anoView = p.anoView; perfilAba = p.perfilAba || "geral";
   document.getElementById("main").scrollTop = 0;
   jaRolou = true;
   render();
@@ -774,6 +823,54 @@ function classificacao(grupo, lista){
   linhas.sort((a,b) => b.p - a.p || b.v - a.v || (b.gp-b.gc)-(a.gp-a.gc) || b.gp - a.gp
     || a.time.turma.localeCompare(b.time.turma));
   return linhas;
+}
+
+/* Artilharia: conta os gols lançados por jogador. Gol contra não entra
+   para ninguém — o ponto foi do outro time, o gol não é do artilheiro.
+   A chave é time+nome: dois xarás em turmas diferentes são duas pessoas. */
+function artilharia(lista, doTime){
+  const mapa = new Map();
+  lista.filter(encerrado).forEach(m => {
+    (Array.isArray(m.gols) ? m.gols : []).forEach(g => {
+      if (!g.jogador || g.contra) return;
+      if (doTime && g.time !== doTime) return;
+      const k = g.time + "|" + g.jogador;
+      const r = mapa.get(k) || {jogador:g.jogador, time:g.time, gols:0};
+      r.gols++;
+      mapa.set(k, r);
+    });
+  });
+  return [...mapa.values()].sort((a,b) => b.gols - a.gols || a.jogador.localeCompare(b.jogador));
+}
+
+/* Defesa menos vazada: média de gols sofridos por jogo, porque quem
+   avança no mata-mata joga mais e seria punido pelo número absoluto. */
+function defesas(lista){
+  const linhas = TIMES.map(t => ({time:t, j:0, sofridos:0}));
+  const porId = Object.fromEntries(linhas.map(l => [l.time.id, l]));
+  lista.filter(encerrado).forEach(m => {
+    const c = porId[m.casa], f = porId[m.fora];
+    if (!c || !f) return;
+    const [pc, pf] = placar(m);
+    c.j++; f.j++;
+    c.sofridos += Number(pf) || 0;
+    f.sofridos += Number(pc) || 0;
+  });
+  return linhas.filter(l => l.j > 0).sort((a,b) =>
+    (a.sofridos / a.j) - (b.sofridos / b.j) || a.sofridos - b.sofridos || b.j - a.j
+    || a.time.turma.localeCompare(b.time.turma));
+}
+
+/* O elenco de cada turma é a mesma lista que o admin usa para oferecer
+   os autores dos gols: ELENCO_FIXO manda, e quem apareceu marcando sem
+   estar cadastrado entra depois dele. */
+function elencoDe(id, lista){
+  const fixo = ELENCO_FIXO[id] || [];
+  const gols = artilharia(lista || jogos(), id);
+  const porNome = Object.fromEntries(gols.map(g => [g.jogador, g.gols]));
+  const extras = gols.map(g => g.jogador).filter(n => !fixo.includes(n));
+  return fixo.concat(extras).map(nome => ({nome, gols: porNome[nome] || 0,
+    avulso: !fixo.includes(nome)}));
 }
 
 const ordenadas = lista => lista.slice().sort((a,b) =>
@@ -972,10 +1069,12 @@ function viewClassificacao(){
   html += `<div class="segmento">
       <button class="seg" data-fase="grupos" aria-pressed="${faseView === "grupos"}">Fase de grupos</button>
       <button class="seg" data-fase="mata" aria-pressed="${faseView === "mata"}">Mata-mata</button>
+      <button class="seg" data-fase="numeros" aria-pressed="${faseView === "numeros"}">Artilharia</button>
     </div>`;
 
   const lista = jogos();
   if (faseView === "mata") return html + viewMataMata(lista);
+  if (faseView === "numeros") return html + viewNumeros(lista);
 
   html += faixaSimulacao();
 
@@ -1012,6 +1111,71 @@ function viewClassificacao(){
 
   html += `<div class="legenda"><i class="direto"></i> Vai direto à semifinal <i class="repesca" style="margin-left:10px"></i> Passa pela repescagem</div>
     <div class="aviso"><span>Desempate por pontos, vitórias, saldo de gols e gols pró. O 4º de cada grupo está eliminado.</span></div>`;
+  return html;
+}
+
+/* ---------- artilharia e defesa menos vazada ---------- */
+const ICONE_GOL = `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7.2l3.4 2.5-1.3 4h-4.2l-1.3-4z"/></svg>`;
+const ICONE_ESCUDO = `<svg viewBox="0 0 24 24" aria-hidden="true" stroke-linecap="round"><path d="M12 3.6 19 6.4v5.3c0 3.8-2.8 6.7-7 8-4.2-1.3-7-4.2-7-8V6.4z"/></svg>`;
+
+function viewNumeros(lista){
+  const goleadores = artilharia(lista);
+  const defs = defesas(lista);
+
+  let html = faixaSimulacao();
+
+  if (!goleadores.length){
+    html += `<div class="vazio">
+      <span class="glyph">Sem gols lançados</span>
+      <p>A artilharia aparece aqui assim que os autores dos gols forem lançados.</p>
+      <p>Cada gol lançado com o nome de quem marcou já conta para a lista.</p>
+    </div>`;
+  } else {
+    const l = goleadores[0], t = timeDe(l.time);
+    const empatados = goleadores.filter(g => g.gols === l.gols).length;
+    html += `<div class="destaque-cartao">
+        ${t ? `<img src="${escudo(t.id)}" alt="" width="44" height="44">` : ""}
+        <div style="min-width:0">
+          <div class="rot">${empatados > 1 ? "Artilheiros" : "Artilheiro da copa"}</div>
+          <div class="nm">${esc(empatados > 1 ? empatados + " empatados" : l.jogador)}</div>
+          <div class="sub">${esc(empatados > 1 ? "no topo da lista" : (t ? t.nome : ""))}</div>
+        </div>
+        <div class="big"><div class="v">${l.gols}</div><div class="k">${l.gols === 1 ? "gol" : "gols"}</div></div>
+      </div>`;
+
+    html += `<div class="sec">Artilharia</div>`;
+    html += goleadores.map((g, i) => {
+      const tt = timeDe(g.time);
+      return `<div class="elenco-linha${g.gols === l.gols ? " lider" : ""}">
+        <span class="num-camisa">${i + 1}</span>
+        ${tt ? `<img class="esc-link" data-time="${tt.id}" src="${escudo(tt.id)}" alt="" width="26" height="26">` : ""}
+        <span class="quem">
+          <span class="a">${esc(g.jogador)}</span>
+          <span class="b">${esc(tt ? tt.turma + " · " + tt.nome : "")}</span>
+        </span>
+        <span class="marca-gols">${g.gols}${ICONE_GOL}</span>
+      </div>`;
+    }).join("");
+  }
+
+  if (defs.length){
+    html += `<div class="sec">Defesa menos vazada</div>`;
+    const melhor = defs[0].sofridos / defs[0].j;
+    html += defs.map((d, i) => {
+      const media = d.sofridos / d.j;
+      return `<div class="elenco-linha${media === melhor ? " lider" : ""}">
+        <span class="num-camisa">${i + 1}</span>
+        <img class="esc-link" data-time="${d.time.id}" src="${escudo(d.time.id)}" alt="" width="26" height="26">
+        <span class="quem">
+          <span class="a">${esc(d.time.nome)}</span>
+          <span class="b">${esc(d.time.turma)} · ${d.j} ${d.j === 1 ? "jogo" : "jogos"} · ${media.toFixed(1).replace(".", ",")} por jogo</span>
+        </span>
+        <span class="marca-gols${d.sofridos === 0 ? "" : ""}">${d.sofridos}${ICONE_ESCUDO}</span>
+      </div>`;
+    }).join("");
+    html += `<div class="aviso"><span>A ordem é pela <b>média de gols sofridos por jogo</b> — quem avança no mata-mata joga mais e não pode ser punido por isso. O número à direita é o total sofrido.</span></div>`;
+  }
+
   return html;
 }
 
@@ -1106,6 +1270,40 @@ function viewEdicaoAntiga(ano){
     <div class="aviso"><span><b>Ainda não é oficial.</b> Reconstituído pelas bios das turmas no Instagram — falta a confirmação da organização.</span></div>`;
 }
 
+/* ---------- perfil do time: aba elenco ---------- */
+/* A lista aqui é a MESMA que o admin oferece na hora de lançar quem
+   marcou. Cadastrou no elenco, aparece lá; marcou sem estar cadastrado,
+   entra aqui depois, marcado como fora da lista. */
+function viewElenco(id, lista){
+  const t = timeDe(id);
+  const elenco = elencoDe(id, lista);
+
+  if (!elenco.length){
+    return `<div class="vazio">
+      <span class="glyph">Elenco não enviado</span>
+      <p>A ${esc(t.turma)} ainda não mandou a lista de jogadores.</p>
+      <p>Com o elenco aqui, lançar gol vira escolher um nome — e a artilharia se monta sozinha.</p>
+    </div>`;
+  }
+
+  const total = elenco.reduce((n, j) => n + j.gols, 0);
+  const artilheiro = Math.max(...elenco.map(j => j.gols));
+
+  return `<div class="sec">Elenco<span class="hint">${elenco.length} ${
+      elenco.length === 1 ? "jogador" : "jogadores"} · ${total} ${
+      total === 1 ? "gol" : "gols"} na copa</span></div>
+    ${elenco.map((j, i) => `<div class="elenco-linha${
+        j.gols && j.gols === artilheiro ? " lider" : ""}">
+      <span class="num-camisa">${i + 1}</span>
+      <span class="quem">
+        <span class="a">${esc(j.nome)}</span>
+        ${j.avulso ? `<span class="b">fora da lista da turma</span>` : ""}
+      </span>
+      <span class="marca-gols${j.gols ? "" : " zero"}">${j.gols}${ICONE_GOL}</span>
+    </div>`).join("")}
+    ${total === 0 ? `<div class="aviso"><span>Ninguém marcou ainda nesta edição.</span></div>` : ""}`;
+}
+
 /* ---------- aba: meu time ---------- */
 function viewMeuTime(){
   const id = telaTime || favorita;
@@ -1138,26 +1336,12 @@ function viewMeuTime(){
     if (h.terceiro === id) conquistas.push("3º em " + h.ano);
   });
 
-  return `${btnVoltar("Voltar")}
-    <div class="hero">
-      <img src="${escudo(id)}" alt="Escudo do ${esc(t.nome)}" width="70" height="70">
-      <div style="min-width:0">
-        <h1>${esc(t.nome)}</h1>
-        ${t.insta ? `<a class="insta" href="https://instagram.com/${esc(t.insta)}" target="_blank" rel="noopener">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5"/><circle cx="12" cy="12" r="4.1"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/></svg>
-          @${esc(t.insta)}</a>` : ""}
-        <div class="hero-meta">
-          <span>${esc(t.turma)}</span><span>Grupo ${t.grupo}</span>
-          ${ehFav ? `<span class="destaque" style="background:${t.cor}">Minha turma</span>` : ""}
-        </div>
-      </div>
-    </div>
+  const segmento = `<div class="segmento" style="margin-top:16px">
+      <button class="seg" data-perfil="geral" aria-pressed="${perfilAba === "geral"}">Visão geral</button>
+      <button class="seg" data-perfil="elenco" aria-pressed="${perfilAba === "elenco"}">Elenco</button>
+    </div>`;
 
-    ${t.bio ? `<p class="bio">${esc(t.bio)}</p>` : ""}
-
-    ${faixaSimulacao()}
-
-    <div class="sec">Fase de grupos<span class="hint">${l.j ? (pos+1) + "º no grupo " + t.grupo : "ainda sem jogos"}</span></div>
+  const geral = `<div class="sec">Fase de grupos<span class="hint">${l.j ? (pos+1) + "º no grupo " + t.grupo : "ainda sem jogos"}</span></div>
     <div class="resumo">
       <div><div class="v">${l.p}</div><div class="k">Pts</div></div>
       <div><div class="v">${l.j}</div><div class="k">J</div></div>
@@ -1177,7 +1361,28 @@ function viewMeuTime(){
 
     ${conquistas.length ? `<div class="sec">Na história da copa</div>
       <div class="hero-meta" style="gap:7px;margin-top:10px">${conquistas.map(c =>
-        `<span style="border:1px solid var(--line-solid);border-radius:999px;padding:4px 10px;color:var(--gold);font-size:11.5px;font-weight:600">${c}</span>`).join("")}</div>` : ""}
+        `<span style="border:1px solid var(--line-solid);border-radius:999px;padding:4px 10px;color:var(--gold);font-size:11.5px;font-weight:600">${c}</span>`).join("")}</div>` : ""}`;
+
+  return `${btnVoltar("Voltar")}
+    <div class="hero">
+      <img src="${escudo(id)}" alt="Escudo do ${esc(t.nome)}" width="70" height="70">
+      <div style="min-width:0">
+        <h1>${esc(t.nome)}</h1>
+        ${t.insta ? `<a class="insta" href="https://instagram.com/${esc(t.insta)}" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5"/><circle cx="12" cy="12" r="4.1"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/></svg>
+          @${esc(t.insta)}</a>` : ""}
+        <div class="hero-meta">
+          <span>${esc(t.turma)}</span><span>Grupo ${t.grupo}</span>
+          ${ehFav ? `<span class="destaque" style="background:${t.cor}">Minha turma</span>` : ""}
+        </div>
+      </div>
+    </div>
+
+    ${t.bio ? `<p class="bio">${esc(t.bio)}</p>` : ""}
+
+    ${faixaSimulacao()}
+    ${segmento}
+    ${perfilAba === "elenco" ? viewElenco(id, lista) : geral}
 
     <button class="trocar" id="btn-trocar">Trocar de turma</button>`;
 }
@@ -1219,7 +1424,7 @@ function render(){
 document.getElementById("tabbar").addEventListener("click", ev => {
   const b = ev.target.closest(".tab");
   if (!b) return;
-  aba = b.dataset.aba; telaTime = null; telaJogo = null; pilha = []; fecharMenu();
+  aba = b.dataset.aba; telaTime = null; telaJogo = null; pilha = []; perfilAba = "geral"; fecharMenu();
   document.getElementById("main").scrollTop = 0;
   jaRolou = aba !== "jogos";
   render();
@@ -1236,8 +1441,11 @@ document.getElementById("main").addEventListener("click", ev => {
     return;
   }
 
-  const seg = ev.target.closest(".seg");
+  const seg = ev.target.closest(".seg[data-fase]");
   if (seg){ faseView = seg.dataset.fase; render(); return; }
+
+  const segPerfil = ev.target.closest(".seg[data-perfil]");
+  if (segPerfil){ perfilAba = segPerfil.dataset.perfil; render(); return; }
 
   const linha = ev.target.closest(".jogo, .cc");
   if (linha){ navegar({telaJogo: linha.dataset.jogo}); return; }
