@@ -2,7 +2,7 @@
    Guarda o app para abrir offline e busca os resultados sempre da rede.
    Ao publicar uma versão nova, troque o número em VERSAO. */
 
-const VERSAO = "copa-rino-v1";
+const VERSAO = "copa-rino-v5";
 
 const CASCA = [
   "./",

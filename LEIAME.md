@@ -70,15 +70,15 @@ Formato de cada partida:
 ```
 
 - **ids das turmas:** `t15` `t18` `t19` `t20` `t21` `t23` `t24` `t25`
-- **status:** `agendado` · `ao_vivo` · `encerrado` · `wo`
-- **golsCasa / golsFora:** `null` enquanto não houver placar
+- **status:** `agendado` · `encerrado` · `wo` — não existe estado ao vivo
+- **golsCasa / golsFora:** só aparecem no app quando `status` for `encerrado`
 - **fase:** `grupos` · `quartas` · `semi` · `final` · `terceiro`
 
 Enquanto `partidas` estiver vazio, o app mostra uma simulação da fase de
 grupos, sinalizada na tela com uma faixa vermelha. A faixa some sozinha no
 instante em que a primeira partida de verdade for gravada.
 
-## Se um dia o GitHub ficar lento demais para o ao vivo
+## Se um dia quiserem resultado mais rápido
 
 Editar o `dados.json` pelo GitHub leva cerca de um minuto até o ar. Para
 placar minuto a minuto isso pode incomodar. Quando chegar a hora, o
@@ -92,7 +92,7 @@ muda.
 ## Ao mexer no código do app
 
 Se editar `index.html`, `sw.js` ou os escudos, troque o número em
-`const VERSAO = "copa-rino-v1"` no `sw.js` (v2, v3...). Sem isso, quem já tem o
+`const VERSAO = "copa-rino-v5"` no `sw.js` (v2, v3...). Sem isso, quem já tem o
 app instalado continua vendo a versão antiga, guardada no cache.
 
 Trocar só o `dados.json` não exige isso — ele nunca é servido do cache.

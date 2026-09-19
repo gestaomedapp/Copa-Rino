@@ -121,6 +121,7 @@ main{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:0 18px 100px;scr
 .jogo{
   display:grid;grid-template-columns:1fr 62px 1fr;align-items:center;gap:8px;
   padding:13px 0;width:100%;text-align:left;border-bottom:1px solid var(--line);
+  cursor:pointer;
 }
 .lista .jogo:last-child{border-bottom:none}
 .jogo:hover{background:rgba(255,255,255,.015)}
@@ -136,19 +137,47 @@ main{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:0 18px 100px;scr
 .jogo:not(.fim) .lado .nm{color:var(--text);font-weight:500}
 .centro{display:flex;flex-direction:column;align-items:center;gap:1px}
 .centro .rot{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
-.centro .rot.vivo{color:var(--red)}
-.centro .rot.vivo::before{
-  content:"";display:inline-block;width:5px;height:5px;border-radius:50%;
-  background:var(--red);margin-right:4px;vertical-align:middle;
-  animation:pulso 1.7s ease-in-out infinite;
-}
-@keyframes pulso{0%,100%{opacity:1}50%{opacity:.2}}
-@media (prefers-reduced-motion:reduce){.centro .rot.vivo::before{animation:none}}
 .centro .val{
   font-size:16.5px;font-weight:700;font-variant-numeric:tabular-nums;
   line-height:1.2;color:var(--muted);letter-spacing:-.01em;
 }
-.jogo.fim .centro .val,.jogo.vivo .centro .val{color:var(--text)}
+.jogo.fim .centro .val{color:var(--text)}
+.esc-link{cursor:pointer;border-radius:50%;display:block;flex:none}
+
+/* ---------- tela da partida ---------- */
+.voltar{
+  display:inline-flex;align-items:center;gap:7px;padding:14px 0 4px;
+  font-size:13px;font-weight:600;color:var(--faint);
+}
+.voltar:hover{color:var(--text)}
+.voltar svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+.placar{display:grid;grid-template-columns:1fr auto 1fr;align-items:start;gap:12px;padding:14px 0 20px}
+.placar .eq{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;min-width:0}
+.placar .eq img{width:58px;height:58px;border-radius:50%}
+.placar .eq .nm{font-size:13.5px;font-weight:600;line-height:1.25;color:var(--text)}
+.placar .eq .tn{font-size:11px;color:var(--faint);font-weight:600;letter-spacing:.05em;margin-top:2px}
+.placar .meio{display:flex;flex-direction:column;align-items:center;gap:7px;padding-top:14px}
+.placar .pl{font-size:34px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.03em;line-height:1}
+.placar .pl.pend{font-size:23px;color:var(--muted);font-weight:700}
+.placar .et{font-size:10.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--faint)}
+
+.ficha{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:0 0 4px}
+.ficha span{
+  border:1px solid var(--line-solid);border-radius:999px;padding:3px 11px;
+  font-size:11.5px;font-weight:600;color:var(--faint);
+}
+.gol{
+  display:grid;grid-template-columns:1fr 22px 1fr;align-items:center;gap:10px;
+  padding:12px 0;border-bottom:1px solid var(--line);
+}
+.gol:last-child{border-bottom:none}
+.gol .quem{min-width:0}
+.gol .quem .a{font-size:14px;font-weight:600;color:var(--text);line-height:1.3}
+.gol .quem .b{font-size:12px;color:var(--faint);line-height:1.35}
+.gol .quem.esq{text-align:right}
+.gol .bola{width:20px;height:20px;justify-self:center;opacity:.85}
+.gol .bola svg{width:20px;height:20px;stroke:var(--muted);fill:none;stroke-width:1.5}
 
 /* ---------- classificação ---------- */
 .grupo-cab{
@@ -208,7 +237,17 @@ tr.fav .linha-time .nm{color:var(--gold)}
 /* ---------- meu time ---------- */
 .hero{display:flex;align-items:center;gap:15px;padding:22px 0 20px}
 .hero img{width:70px;height:70px;border-radius:50%;flex:none}
-.hero h1{font-weight:800;font-size:22px;line-height:1.1;margin:0 0 7px;letter-spacing:-.025em;text-wrap:balance}
+.hero h1{font-weight:800;font-size:22px;line-height:1.1;margin:0 0 5px;letter-spacing:-.025em;text-wrap:balance}
+.hero .insta{
+  display:inline-flex;align-items:center;gap:5px;margin:0 0 8px;
+  font-size:12.5px;font-weight:500;color:var(--faint);text-decoration:none;
+}
+.hero .insta svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.7;flex:none}
+.hero .insta:hover{color:var(--red)}
+.bio{
+  margin:0 0 4px;font-size:13.5px;line-height:1.5;color:var(--muted);
+  max-width:46ch;text-wrap:pretty;
+}
 .hero-meta{display:flex;flex-wrap:wrap;gap:6px;font-size:11px;font-weight:600;letter-spacing:.04em}
 .hero-meta span{border:1px solid var(--line-solid);border-radius:999px;padding:3px 9px;color:var(--faint)}
 .hero-meta span.destaque{border-color:transparent;color:#0B0C0E}
@@ -319,11 +358,25 @@ tr.fav .linha-time .nm{color:var(--gold)}
        fase: "grupos" | "quartas" | "semi" | "final" | "terceiro",
        rodada: 1,                   // só na fase de grupos
        casa: "t15", fora: "t19",
-       golsCasa: 2, golsFora: 1,    // null enquanto não houver placar
-       status: "agendado" | "ao_vivo" | "encerrado" | "wo",
+       golsCasa: 2, golsFora: 1,    // só valem quando o jogo está encerrado
+       status: "agendado" | "encerrado" | "wo",
        dataHora: "2026-09-27T09:00:00-03:00",
-       local: "Quadra 1"
+       local: "Quadra 1",
+       gols: [                      // quem marcou — na ordem em que saíram
+         {time:"t15", jogador:"Léo Martins", assistencia:"Caio Ferraz"},
+         {time:"t15", jogador:"Vini Prado", contra:true}
+       ]
      }
+
+   Sobre "gols": "time" é o id do time que MARCOU o gol (em gol
+   contra, o time que ficou com o ponto). "assistencia" e
+   "contra" são opcionais. Se golsCasa/golsFora vierem vazios mas
+   houver gols na lista, o placar é contado a partir dela.
+
+   NÃO existe estado "ao vivo": acompanhar jogo em andamento
+   exigiria alguém atualizando à beira da quadra. Um jogo ou está
+   encerrado, com placar, ou está por vir, sem placar nenhum —
+   mesmo que o placar já tenha sido preenchido por engano.
 
    Enquanto a coleção estiver vazia, o app roda uma SIMULAÇÃO da
    fase de grupos (turno único, todos contra todos dentro do
@@ -334,15 +387,41 @@ tr.fav .linha-time .nm{color:var(--gold)}
 const EDICAO_ATUAL = 2026;
 const CLASSIFICAM_POR_GRUPO = 2;   // confirmar no regulamento
 
+/* insta e bio vêm do perfil de cada turma no Instagram.
+   As bios foram copiadas como estão, tirando só a lista de títulos —
+   esses aparecem sozinhos em "Na história da copa". */
 const TIMES = [
-  {id:"t15", turma:"T15", nome:"Renal Madrid",         grupo:"A", cor:"#C9A227"},
-  {id:"t19", turma:"T19", nome:"Borússia Doctors",     grupo:"A", cor:"#FADF00"},
-  {id:"t20", turma:"T20", nome:"MilanB FC",            grupo:"A", cor:"#E23B3B"},
-  {id:"t25", turma:"T25", nome:"Bayern Pneumunique",   grupo:"A", cor:"#DC0A2D"},
-  {id:"t18", turma:"T18", nome:"Botafofo FC",          grupo:"B", cor:"#F2C438"},
-  {id:"t21", turma:"T21", nome:"Ozempic de Marseille", grupo:"B", cor:"#D4B169"},
-  {id:"t23", turma:"T23", nome:"Real Diabetis",        grupo:"B", cor:"#1E8449"},
-  {id:"t24", turma:"T24", nome:"Liverpulmonar",        grupo:"B", cor:"#C8102E"},
+  {id:"t15", turma:"T15", nome:"Renal Madrid",         grupo:"A", cor:"#C9A227",
+   insta:"renalmadridtxv",
+   bio:"O maior time da medcesu — TXV. Todos querem ser T15."},
+
+  {id:"t19", turma:"T19", nome:"Borússia Doctors",     grupo:"A", cor:"#FADF00",
+   insta:"borussia.doctors",
+   bio:"Time da T19."},
+
+  {id:"t20", turma:"T20", nome:"MilanB FC",            grupo:"A", cor:"#E23B3B",
+   insta:"milanbtxx",
+   bio:"Fut TXX — MedCesu. A torcida pede: joguem como bebemos!"},
+
+  {id:"t25", turma:"T25", nome:"Bayern Pneumunique",   grupo:"A", cor:"#DC0A2D",
+   insta:"bayernpneumunique.txxv",
+   bio:"Time da T25 — Medicina Cesu."},
+
+  {id:"t18", turma:"T18", nome:"Botafofo FC",          grupo:"B", cor:"#F2C438",
+   insta:"botafofo_t18",
+   bio:""},
+
+  {id:"t21", turma:"T21", nome:"Ozempic de Marseille", grupo:"B", cor:"#D4B169",
+   insta:"ozempicdemarseille21",
+   bio:"Perfil oficial de futebol da T21. Segue a gente e acompanha a maior seleção. Est. 2024."},
+
+  {id:"t23", turma:"T23", nome:"Real Diabetis",        grupo:"B", cor:"#1E8449",
+   insta:"realdiabetist23",
+   bio:"Fut T23 — Medcesu."},
+
+  {id:"t24", turma:"T24", nome:"Liverpulmonar",        grupo:"B", cor:"#C8102E",
+   insta:"liverpulmonar.txxiv",
+   bio:"Medicina Unicesumar T24"},
 ];
 
 /* Reconstituído pelas bios das turmas no Instagram — não confirmado
@@ -358,23 +437,63 @@ const timeDe = id => TIMES.find(t => t.id === id) || null;
 const escudo = id => "escudos/" + id + ".png";
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
+const hash = s => { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return h; };
+const chaveJogo = m => m.id || [m.edicao || EDICAO_ATUAL, m.fase, m.rodada || 0, m.casa, m.fora].join("-");
+
+/* Só existem dois estados: encerrado ou por vir. Qualquer status que
+   não seja encerrado/wo conta como jogo que ainda não aconteceu. */
+const encerrado = m => m.status === "encerrado" || m.status === "wo";
+
+/* Placar oficial: usa golsCasa/golsFora e, na falta deles, conta a
+   lista de gols. Jogo não encerrado nunca mostra placar, mesmo que
+   os gols já tenham sido preenchidos. */
+function placar(m){
+  if (!encerrado(m)) return [null, null];
+  if (m.golsCasa != null && m.golsFora != null) return [Number(m.golsCasa), Number(m.golsFora)];
+  if (Array.isArray(m.gols) && m.gols.length){
+    return [m.gols.filter(g => g.time === m.casa).length, m.gols.filter(g => g.time === m.fora).length];
+  }
+  return [null, null];
+}
+
 /* ---------- simulação da fase de grupos ---------- */
-/* Turno único: em cada grupo de 4, todos se enfrentam uma vez = 3 rodadas.
-   Duas quadras em paralelo, jogos de 40 em 40 minutos. */
+/* A copa inteira acontece em um dia. Turno único: em cada grupo de 4,
+   todos se enfrentam uma vez = 3 rodadas. Duas quadras em paralelo,
+   jogos de 40 em 40 minutos. */
+const NOMES_EXEMPLO = [
+  "Léo Martins","Caio Ferraz","Pedro Bastos","Rafa Quirino","Dudu Carvalho","Vini Prado",
+  "Gui Menezes","Bruno Tavares","Matheus Lins","Téo Andrade","João Peçanha","Arthur Nogueira",
+  "Felipe Rangel","Otávio Brandão","Murilo Sampaio","Gabriel Ítalo",
+];
+
+function golsExemplo(casa, fora, gc, gf){
+  const lista = [];
+  const semente = hash(casa + fora);
+  const add = (time, i, n) => {
+    const h = hash(time + i + n);
+    const jogador = NOMES_EXEMPLO[(semente + h) % NOMES_EXEMPLO.length];
+    let assistencia = NOMES_EXEMPLO[(semente + h * 7 + 5) % NOMES_EXEMPLO.length];
+    if (assistencia === jogador || h % 3 === 0) assistencia = null;
+    lista.push({time, jogador, assistencia});
+  };
+  for (let i = 0; i < gc; i++) add(casa, i, "c");
+  for (let i = 0; i < gf; i++) add(fora, i, "f");
+  return lista;
+}
+
 function simulacao(){
   const conf = {
     A: [[["t15","t20"],["t19","t25"]], [["t15","t19"],["t20","t25"]], [["t15","t25"],["t19","t20"]]],
     B: [[["t18","t23"],["t21","t24"]], [["t18","t21"],["t23","t24"]], [["t18","t24"],["t21","t23"]]],
   };
   const agora = new Date();
-  const base = new Date(agora); base.setHours(agora.getHours() - 3, 0, 0, 0);
+  /* Tudo no mesmo dia: o primeiro jogo fica ~2h atrás, preso entre
+     08:00 e 16:00, para a grade nunca atravessar a meia-noite. */
+  const base = new Date(agora);
+  base.setHours(Math.min(16, Math.max(8, agora.getHours() - 2)), 0, 0, 0);
 
   /* placar estável: derivado dos ids, não sorteado a cada render */
-  const gols = (a, b) => {
-    let h = 0; const s = a + b;
-    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
-    return [h % 5, (h >>> 7) % 4];
-  };
+  const gols = (a, b) => { const h = hash(a + b); return [h % 5, (h >>> 7) % 4]; };
 
   const jogos = [];
   let slot = 0;
@@ -384,14 +503,15 @@ function simulacao(){
       ["A","B"].forEach((g, qi) => {
         const [casa, fora] = conf[g][r][par];
         const fim = new Date(quando.getTime() + 35 * 60000);
-        const status = fim <= agora ? "encerrado" : (quando <= agora ? "ao_vivo" : "agendado");
+        const acabou = fim <= agora;
         const [gc, gf] = gols(casa, fora);
         jogos.push({
           exemplo:true, edicao:EDICAO_ATUAL, fase:"grupos", rodada:r+1,
           casa, fora,
-          golsCasa: status === "agendado" ? null : gc,
-          golsFora: status === "agendado" ? null : gf,
-          status,
+          golsCasa: acabou ? gc : null,
+          golsFora: acabou ? gf : null,
+          gols: acabou ? golsExemplo(casa, fora, gc, gf) : [],
+          status: acabou ? "encerrado" : "agendado",
           dataHora: quando.toISOString(),
           local: "Quadra " + (qi + 1),
         });
@@ -410,6 +530,8 @@ let aba = "jogos";
 let faseView = "grupos";
 let anoView = EDICAO_ATUAL;
 let telaTime = null;
+let telaJogo = null;
+let pilha = [];
 let menuAberto = false;
 let jaRolou = false;
 
@@ -424,17 +546,41 @@ function salvarFavorita(id){
   try { id ? localStorage.setItem(CHAVE, id) : localStorage.removeItem(CHAVE); } catch (e) {}
 }
 
+/* ---------- navegação ---------- */
+function navegar(novo){
+  pilha.push({aba, telaTime, telaJogo, faseView, anoView});
+  aba = novo.aba != null ? novo.aba : aba;
+  telaTime = novo.telaTime != null ? novo.telaTime : null;
+  telaJogo = novo.telaJogo != null ? novo.telaJogo : null;
+  document.getElementById("main").scrollTop = 0;
+  jaRolou = true;
+  render();
+}
+function voltar(){
+  const p = pilha.pop();
+  if (!p) return;
+  aba = p.aba; telaTime = p.telaTime; telaJogo = p.telaJogo;
+  faseView = p.faseView; anoView = p.anoView;
+  document.getElementById("main").scrollTop = 0;
+  jaRolou = true;
+  render();
+}
+const btnVoltar = rotulo => pilha.length
+  ? `<button class="voltar" id="btn-voltar"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>${esc(rotulo || "Voltar")}</button>`
+  : "";
+
 /* ---------- derivações ---------- */
 function classificacao(grupo, lista){
   const linhas = TIMES.filter(t => t.grupo === grupo)
     .map(t => ({time:t, p:0, j:0, v:0, e:0, d:0, gp:0, gc:0}));
   const porId = Object.fromEntries(linhas.map(l => [l.time.id, l]));
 
-  lista.filter(m => m.fase === "grupos" && (m.status === "encerrado" || m.status === "wo"))
+  lista.filter(m => m.fase === "grupos" && encerrado(m))
     .forEach(m => {
       const c = porId[m.casa], f = porId[m.fora];
       if (!c || !f) return;
-      const gc = Number(m.golsCasa)||0, gf = Number(m.golsFora)||0;
+      const [pc, pf] = placar(m);
+      const gc = Number(pc)||0, gf = Number(pf)||0;
       c.j++; f.j++; c.gp+=gc; c.gc+=gf; f.gp+=gf; f.gc+=gc;
       if (gc > gf){ c.v++; c.p+=3; f.d++; }
       else if (gc < gf){ f.v++; f.p+=3; c.d++; }
@@ -488,27 +634,90 @@ const faixaSimulacao = () => ehSimulacao()
 function linhaJogo(m){
   const c = timeDe(m.casa), f = timeDe(m.fora);
   if (!c || !f) return "";
-  const fim = m.status === "encerrado" || m.status === "wo";
-  const vivo = m.status === "ao_vivo";
-  const temPlacar = m.golsCasa != null && m.golsFora != null;
+  const fim = encerrado(m);
+  const [pc, pf] = placar(m);
+  const temPlacar = pc != null && pf != null;
 
-  const rot = vivo ? `<span class="rot vivo">Ao vivo</span>`
-    : fim ? `<span class="rot">Fim</span>`
+  const rot = fim ? `<span class="rot">Fim</span>`
     : `<span class="rot">${esc(m.local || "")}</span>`;
-  const val = temPlacar ? `${m.golsCasa} - ${m.golsFora}` : hora(m.dataHora);
+  const val = temPlacar ? `${pc} - ${pf}` : hora(m.dataHora);
 
-  const lado = (t, pos, venceu) => `
-    <span class="lado ${pos}${venceu ? " venceu" : ""}">
-      ${pos === "casa"
-        ? `<span class="nm">${esc(t.nome)}</span><img src="${escudo(t.id)}" alt="" width="27" height="27">`
-        : `<img src="${escudo(t.id)}" alt="" width="27" height="27"><span class="nm">${esc(t.nome)}</span>`}
+  /* o escudo aqui NÃO é clicável: a linha inteira leva à partida,
+     e um alvo menor dentro dela só gera toque sem intenção */
+  const lado = (t, pos, venceu) => {
+    const img = `<img src="${escudo(t.id)}" alt="" width="27" height="27">`;
+    return `<span class="lado ${pos}${venceu ? " venceu" : ""}">
+      ${pos === "casa" ? `<span class="nm">${esc(t.nome)}</span>${img}` : `${img}<span class="nm">${esc(t.nome)}</span>`}
     </span>`;
+  };
 
-  return `<div class="jogo ${fim ? "fim" : ""}${vivo ? " vivo" : ""}">
-    ${lado(c, "casa", temPlacar && m.golsCasa > m.golsFora)}
+  return `<div class="jogo ${fim ? "fim" : ""}" role="button" tabindex="0" data-jogo="${esc(chaveJogo(m))}">
+    ${lado(c, "casa", temPlacar && pc > pf)}
     <span class="centro">${rot}<span class="val">${val}</span></span>
-    ${lado(f, "fora", temPlacar && m.golsFora > m.golsCasa)}
+    ${lado(f, "fora", temPlacar && pf > pc)}
   </div>`;
+}
+
+/* ---------- tela: partida ---------- */
+const ICONE_BOLA = `<span class="bola"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7.2l3.4 2.5-1.3 4h-4.2l-1.3-4z"/><path d="M12 3.1v4.1M19.6 9.3l-4 .4M17.3 18.1l-2.9-2.4M6.7 18.1l2.9-2.4M4.4 9.3l4 .4"/></svg></span>`;
+
+function viewPartida(){
+  const m = jogos().find(x => chaveJogo(x) === telaJogo);
+  if (!m) return `<div class="vazio"><p>Esta partida não está mais na tabela.</p></div>`;
+  const c = timeDe(m.casa), f = timeDe(m.fora);
+  if (!c || !f) return `<div class="vazio"><p>Partida com time desconhecido.</p></div>`;
+
+  const fim = encerrado(m);
+  const [pc, pf] = placar(m);
+  const temPlacar = pc != null && pf != null;
+
+  const eq = t => `<div class="eq">
+      <img class="esc-link" data-time="${t.id}" src="${escudo(t.id)}" alt="Escudo do ${esc(t.nome)}" width="58" height="58">
+      <div><div class="nm">${esc(t.nome)}</div><div class="tn">${esc(t.turma)}</div></div>
+    </div>`;
+
+  const etiqueta = fim ? `<span class="et">Encerrado</span>`
+    : `<span class="et">${esc(rotuloDia(chaveDia(m.dataHora)))}</span>`;
+
+  const ficha = [
+    m.fase === "grupos" ? "Rodada " + (m.rodada || "?") : faseNome(m.fase),
+    m.local || null,
+    m.dataHora ? hora(m.dataHora) : null,
+  ].filter(Boolean);
+
+  const gols = Array.isArray(m.gols) ? m.gols : [];
+  let listaGols;
+  if (gols.length){
+    listaGols = gols.map(g => {
+      const doCasa = g.time === m.casa;
+      const nome = esc(g.jogador || "Gol") + (g.contra ? " (contra)" : "");
+      const quem = `<div class="quem ${doCasa ? "esq" : "dir"}">
+          <div class="a">${nome}</div>
+          ${g.assistencia ? `<div class="b">${esc(g.assistencia)}</div>` : ""}
+        </div>`;
+      return `<div class="gol">${doCasa ? quem : "<div></div>"}${ICONE_BOLA}${doCasa ? "<div></div>" : quem}</div>`;
+    }).join("");
+  } else if (temPlacar && (pc + pf) === 0){
+    listaGols = `<div class="vazio" style="padding:26px 10px"><p>Jogo sem gols.</p></div>`;
+  } else if (temPlacar){
+    listaGols = `<div class="vazio" style="padding:26px 10px"><p>Os autores dos gols ainda não foram lançados.</p></div>`;
+  } else {
+    listaGols = `<div class="vazio" style="padding:26px 10px"><p>A partida ainda não começou.</p><p>Os gols aparecem aqui assim que forem marcados.</p></div>`;
+  }
+
+  return `${btnVoltar("Voltar")}
+    <div class="placar">
+      ${eq(c)}
+      <div class="meio">
+        <div class="pl ${temPlacar ? "" : "pend"}">${temPlacar ? `${pc} - ${pf}` : esc(hora(m.dataHora))}</div>
+        ${etiqueta}
+      </div>
+      ${eq(f)}
+    </div>
+    <div class="ficha">${ficha.map(x => `<span>${esc(x)}</span>`).join("")}</div>
+    ${faixaSimulacao()}
+    <div class="sec">Gols</div>
+    ${listaGols}`;
 }
 
 /* ---------- aba: jogos ---------- */
@@ -522,7 +731,7 @@ function viewJogos(){
     </div>`;
   }
 
-  const iProximo = lista.findIndex(m => m.status === "agendado" || m.status === "ao_vivo");
+  const iProximo = lista.findIndex(m => !encerrado(m));
   const dias = [];
   lista.forEach((m, i) => {
     const k = chaveDia(m.dataHora);
@@ -639,7 +848,7 @@ function viewEdicaoAntiga(ano){
     const t = timeDe(id);
     return `<div class="podio">
       <span class="rot ${cls}">${rot}</span>
-      ${t ? `<img src="${escudo(id)}" alt="" width="32" height="32"><span class="nm">${esc(t.nome)}</span>`
+      ${t ? `<img class="esc-link" data-time="${t.id}" src="${escudo(id)}" alt="Escudo do ${esc(t.nome)}" width="32" height="32"><span class="nm">${esc(t.nome)}</span>`
           : `<span class="na">a confirmar</span>`}
     </div>`;
   };
@@ -671,8 +880,8 @@ function viewMeuTime(){
   const pos = linhas.findIndex(l => l.time.id === id);
   const l = linhas[pos];
   const meus = ordenadas(lista).filter(m => m.casa === id || m.fora === id);
-  const proximos = meus.filter(m => m.status === "agendado" || m.status === "ao_vivo");
-  const passados = meus.filter(m => m.status === "encerrado" || m.status === "wo").reverse();
+  const proximos = meus.filter(m => !encerrado(m));
+  const passados = meus.filter(encerrado).reverse();
   const ehFav = favorita === id;
 
   const conquistas = [];
@@ -682,16 +891,22 @@ function viewMeuTime(){
     if (h.terceiro === id) conquistas.push("3º em " + h.ano);
   });
 
-  return `<div class="hero">
+  return `${btnVoltar("Voltar")}
+    <div class="hero">
       <img src="${escudo(id)}" alt="Escudo do ${esc(t.nome)}" width="70" height="70">
       <div style="min-width:0">
         <h1>${esc(t.nome)}</h1>
+        ${t.insta ? `<a class="insta" href="https://instagram.com/${esc(t.insta)}" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5"/><circle cx="12" cy="12" r="4.1"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/></svg>
+          @${esc(t.insta)}</a>` : ""}
         <div class="hero-meta">
           <span>${esc(t.turma)}</span><span>Grupo ${t.grupo}</span>
           ${ehFav ? `<span class="destaque" style="background:${t.cor}">Minha turma</span>` : ""}
         </div>
       </div>
     </div>
+
+    ${t.bio ? `<p class="bio">${esc(t.bio)}</p>` : ""}
 
     ${faixaSimulacao()}
 
@@ -723,12 +938,13 @@ function viewMeuTime(){
 /* ---------- render ---------- */
 function render(){
   const main = document.getElementById("main");
-  if (aba === "jogos") main.innerHTML = viewJogos();
+  if (telaJogo) main.innerHTML = viewPartida();
+  else if (aba === "jogos") main.innerHTML = viewJogos();
   else if (aba === "classificacao") main.innerHTML = viewClassificacao();
   else main.innerHTML = viewMeuTime();
 
   document.querySelectorAll("#tabbar .tab").forEach(b =>
-    b.setAttribute("aria-selected", String(b.dataset.aba === aba)));
+    b.setAttribute("aria-selected", String(!telaJogo && b.dataset.aba === aba)));
 
   const t = favorita ? timeDe(favorita) : null;
   const abaTime = document.getElementById("tab-meutime");
@@ -740,7 +956,7 @@ function render(){
   btn.hidden = !!t;
   if (!t) btn.textContent = "Escolher turma";
 
-  if (aba === "jogos" && !jaRolou){
+  if (aba === "jogos" && !telaJogo && !jaRolou){
     const alvo = document.getElementById("ancora");
     if (alvo){ jaRolou = true; main.scrollTop = Math.max(0, alvo.offsetTop - 10); }
   }
@@ -750,25 +966,46 @@ function render(){
 document.getElementById("tabbar").addEventListener("click", ev => {
   const b = ev.target.closest(".tab");
   if (!b) return;
-  aba = b.dataset.aba; telaTime = null; fecharMenu();
+  aba = b.dataset.aba; telaTime = null; telaJogo = null; pilha = []; fecharMenu();
   document.getElementById("main").scrollTop = 0;
   jaRolou = aba !== "jogos";
   render();
 });
 
 document.getElementById("main").addEventListener("click", ev => {
+  if (ev.target.closest("#btn-voltar")){ voltar(); return; }
+
+  /* escudo tem prioridade sobre a linha do jogo */
+  const escudoAlvo = ev.target.closest(".esc-link");
+  if (escudoAlvo){
+    ev.stopPropagation();
+    navegar({aba:"meutime", telaTime:escudoAlvo.dataset.time});
+    return;
+  }
+
   const seg = ev.target.closest(".seg");
   if (seg){ faseView = seg.dataset.fase; render(); return; }
 
+  const linha = ev.target.closest(".jogo");
+  if (linha){ navegar({telaJogo: linha.dataset.jogo}); return; }
+
   const irTime = ev.target.closest(".ir-time");
-  if (irTime){ aba = "meutime"; telaTime = irTime.dataset.id;
-    document.getElementById("main").scrollTop = 0; render(); return; }
+  if (irTime){ navegar({aba:"meutime", telaTime:irTime.dataset.id}); return; }
 
   const escolha = ev.target.closest("#grade-inline .escolha");
   if (escolha){ salvarFavorita(escolha.dataset.id); telaTime = null; render(); return; }
 
   if (ev.target.closest("#btn-trocar")){ document.getElementById("onboarding").hidden = false; return; }
   if (ev.target.closest("#btn-ano")){ toggleMenu(ev.target.closest("#btn-ano")); return; }
+});
+
+/* teclado: a linha do jogo é um botão */
+document.getElementById("main").addEventListener("keydown", ev => {
+  if (ev.key !== "Enter" && ev.key !== " ") return;
+  const linha = ev.target.closest(".jogo");
+  if (!linha) return;
+  ev.preventDefault();
+  navegar({telaJogo: linha.dataset.jogo});
 });
 
 document.getElementById("btn-turma").addEventListener("click", () => {

@@ -1,5 +1,5 @@
 {
-  "_leiame": "Partidas da Copa Rino. Enquanto 'partidas' estiver vazio, o app mostra uma simulação da fase de grupos, marcada como tal na tela. Formato de cada partida: {fase, rodada, casa, fora, golsCasa, golsFora, status, dataHora, local}. Os ids dos times são t15, t18, t19, t20, t21, t23, t24, t25. status: agendado | ao_vivo | encerrado | wo. golsCasa e golsFora ficam null enquanto não houver placar.",
+  "_leiame": "Partidas da Copa Rino. Enquanto 'partidas' estiver vazio, o app mostra uma simulacao da fase de grupos, marcada como tal na tela. Formato de cada partida: {fase, rodada, casa, fora, golsCasa, golsFora, status, dataHora, local, gols}. Os ids dos times sao t15, t18, t19, t20, t21, t23, t24, t25. status: agendado | encerrado | wo — nao existe 'ao vivo'. Jogo que nao esta encerrado nunca mostra placar, mesmo que golsCasa/golsFora estejam preenchidos.",
   "edicao": 2026,
   "atualizadoEm": null,
   "partidas": [],
@@ -12,6 +12,13 @@
     "golsFora": 1,
     "status": "encerrado",
     "dataHora": "2026-09-27T09:00:00-03:00",
-    "local": "Quadra 1"
+    "local": "Quadra 1",
+    "gols": [
+      {
+        "time": "t15",
+        "jogador": "Nome do jogador",
+        "assistencia": "Quem deu o passe"
+      }
+    ]
   }
 }
