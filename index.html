@@ -34,6 +34,8 @@ img{max-width:100%}
   --red:#E02B32;
   --red-soft:rgba(224,43,50,.10);
   --gold:#E0B03C;
+  --laranja:#EE8B2D;
+  --laranja-fraco:rgba(238,139,45,.12);
   color-scheme:dark;
 }
 *{box-sizing:border-box}
@@ -143,6 +145,14 @@ main{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:0 18px 100px;scr
 }
 .jogo.fim .centro .val{color:var(--text)}
 .esc-link{cursor:pointer;border-radius:50%;display:block;flex:none}
+.sem-escudo{
+  width:27px;height:27px;border-radius:50%;flex:none;
+  border:1px dashed var(--line-solid);
+}
+.sem-escudo.grande{width:58px;height:58px;border-width:2px}
+.lado.indef .nm{color:var(--faint);font-weight:500;font-size:13px}
+.jogo:not(.fim) .lado.indef .nm{color:var(--faint)}
+.placar .eq.indef .nm{color:var(--faint);font-weight:500}
 
 /* ---------- tela da partida ---------- */
 .voltar{
@@ -179,6 +189,41 @@ main{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:0 18px 100px;scr
 .gol .bola{width:20px;height:20px;justify-self:center;opacity:.85}
 .gol .bola svg{width:20px;height:20px;stroke:var(--muted);fill:none;stroke-width:1.5}
 
+/* ---------- chaveamento ---------- */
+.chave{display:flex;flex-direction:column;align-items:center;padding:20px 0 10px}
+.chave-rot{
+  font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--faint);margin-bottom:9px;
+}
+.chave-rot.repesca{color:var(--laranja)}
+.chave-rot.grande{color:var(--red);font-size:13px;letter-spacing:.16em}
+.conector{width:1px;height:22px;background:var(--line-solid);margin:9px 0}
+.cc{
+  width:100%;max-width:236px;background:var(--surface);
+  border:1px solid var(--line-solid);border-radius:10px;
+  padding:11px 12px;text-align:center;cursor:pointer;
+}
+.cc:hover{border-color:var(--muted)}
+.cc.repesca{border-color:rgba(238,139,45,.3)}
+.cc.grande{max-width:100%;padding:18px 14px;border-color:rgba(224,43,50,.35);background:var(--red-soft)}
+.cc-hora{font-size:11px;font-weight:600;color:var(--faint);letter-spacing:.04em}
+.cc-times{display:flex;align-items:flex-start;justify-content:center;gap:12px;margin:10px 0 9px}
+.cc-eq{display:flex;flex-direction:column;align-items:center;gap:6px;width:78px}
+.cc-eq img{width:34px;height:34px;border-radius:50%}
+.cc-eq .sem-escudo{width:34px;height:34px}
+.cc.grande .cc-eq{width:104px}
+.cc.grande .cc-eq img,.cc.grande .cc-eq .sem-escudo{width:54px;height:54px}
+.cc-tn{font-size:10.5px;font-weight:600;color:var(--text);line-height:1.3}
+.cc-eq.indef .cc-tn{color:var(--faint);font-weight:500}
+.cc-meio{display:flex;flex-direction:column;align-items:center;justify-content:center;padding-top:9px;min-width:46px}
+.cc.grande .cc-meio{padding-top:14px}
+.cc-vs{font-size:11px;font-weight:600;color:var(--faint);letter-spacing:.06em}
+.cc-placar{font-size:18px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.02em;white-space:nowrap}
+.cc.grande .cc-placar{font-size:26px}
+.cc-base{font-size:10.5px;color:var(--faint);font-weight:500;letter-spacing:.03em}
+.trofeu{width:22px;height:25px;stroke:var(--gold);fill:none;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
+.cc.grande .trofeu{width:27px;height:31px}
+
 /* ---------- classificação ---------- */
 .grupo-cab{
   margin:24px 0 2px;font-size:11px;font-weight:700;letter-spacing:.12em;
@@ -199,7 +244,8 @@ table.tabela td.pts{color:var(--text);font-weight:700}
 table.tabela th:last-child,table.tabela td:last-child{padding-right:0}
 .linha-time{display:flex;align-items:center;gap:10px;min-width:0}
 .rule{width:2px;height:30px;border-radius:1px;background:transparent;flex:none}
-.rule.passa{background:var(--red)}
+.rule.direto{background:var(--red)}
+.rule.repesca{background:var(--laranja)}
 .pos{font-size:12px;font-weight:600;color:var(--faint);width:10px;text-align:center;flex:none}
 .linha-time img{width:26px;height:26px;border-radius:50%;flex:none}
 .linha-time .txt{min-width:0}
@@ -212,7 +258,12 @@ tr.fav td{background:rgba(224,176,60,.06)}
 tr.fav .linha-time .nm{color:var(--gold)}
 
 .legenda{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:12px;color:var(--faint)}
-.legenda i{width:2px;height:11px;border-radius:1px;background:var(--red);display:inline-block}
+.legenda i{width:2px;height:11px;border-radius:1px;display:inline-block}
+.legenda i.direto{background:var(--red)}
+.legenda i.repesca{background:var(--laranja)}
+.linha-time .sub b{font-weight:600}
+.linha-time .sub b.direto{color:var(--red)}
+.linha-time .sub b.repesca{color:var(--laranja)}
 
 /* ---------- avisos e vazios ---------- */
 .aviso{
@@ -385,7 +436,14 @@ tr.fav .linha-time .nm{color:var(--gold)}
    ============================================================ */
 
 const EDICAO_ATUAL = 2026;
-const CLASSIFICAM_POR_GRUPO = 2;   // confirmar no regulamento
+/* Formato da Copa Rino 2026, confirmado pela organização:
+   1º de cada grupo vai direto à semifinal; 2º e 3º passam pela
+   repescagem; o 4º está eliminado. */
+function destino(i){
+  if (i === 0) return {txt:"Semifinal",  cls:"direto"};
+  if (i <= 2)  return {txt:"Repescagem", cls:"repesca"};
+  return null;
+}
 
 /* insta e bio vêm do perfil de cada turma no Instagram.
    As bios foram copiadas como estão, tirando só a lista de títulos —
@@ -596,8 +654,9 @@ function classificacao(grupo, lista){
 const ordenadas = lista => lista.slice().sort((a,b) =>
   String(a.dataHora || "9999").localeCompare(String(b.dataHora || "9999")));
 
-const faseNome = f => ({grupos:"Fase de grupos", quartas:"Quartas de final",
-  semi:"Semifinal", final:"Final", terceiro:"Disputa de 3º lugar"}[f] || "");
+const FASES_MATA = ["repescagem","semi","final"];
+const faseNome = f => ({grupos:"Fase de grupos", repescagem:"Repescagem",
+  semi:"Semifinal", final:"Final"}[f] || "");
 
 function chaveDia(iso){
   if (!iso) return "sem-data";
@@ -608,7 +667,10 @@ function chaveDia(iso){
 
 function rotuloDia(chave){
   if (chave === "sem-data") return "Data a definir";
-  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  /* os dois ao meio-dia: a diferença sai inteira e o horário de verão
+     não desloca o resultado (meia-noite contra meio-dia arredondava
+     0,5 para cima e o dia de hoje virava "Amanhã") */
+  const hoje = new Date(); hoje.setHours(12,0,0,0);
   const d = new Date(chave + "T12:00:00");
   const dif = Math.round((d - hoje) / 86400000);
   if (dif === 0) return "Hoje";
@@ -633,7 +695,6 @@ const faixaSimulacao = () => ehSimulacao()
 /* ---------- componentes ---------- */
 function linhaJogo(m){
   const c = timeDe(m.casa), f = timeDe(m.fora);
-  if (!c || !f) return "";
   const fim = encerrado(m);
   const [pc, pf] = placar(m);
   const temPlacar = pc != null && pf != null;
@@ -644,17 +705,19 @@ function linhaJogo(m){
 
   /* o escudo aqui NÃO é clicável: a linha inteira leva à partida,
      e um alvo menor dentro dela só gera toque sem intenção */
-  const lado = (t, pos, venceu) => {
-    const img = `<img src="${escudo(t.id)}" alt="" width="27" height="27">`;
-    return `<span class="lado ${pos}${venceu ? " venceu" : ""}">
-      ${pos === "casa" ? `<span class="nm">${esc(t.nome)}</span>${img}` : `${img}<span class="nm">${esc(t.nome)}</span>`}
+  const lado = (t, rotulo, pos, venceu) => {
+    const img = t ? `<img src="${escudo(t.id)}" alt="" width="27" height="27">`
+                  : `<span class="sem-escudo"></span>`;
+    const nm = `<span class="nm">${esc(t ? t.nome : (rotulo || "A definir"))}</span>`;
+    return `<span class="lado ${pos}${venceu ? " venceu" : ""}${t ? "" : " indef"}">
+      ${pos === "casa" ? `${nm}${img}` : `${img}${nm}`}
     </span>`;
   };
 
   return `<div class="jogo ${fim ? "fim" : ""}" role="button" tabindex="0" data-jogo="${esc(chaveJogo(m))}">
-    ${lado(c, "casa", temPlacar && pc > pf)}
+    ${lado(c, m.casaRotulo, "casa", temPlacar && pc > pf)}
     <span class="centro">${rot}<span class="val">${val}</span></span>
-    ${lado(f, "fora", temPlacar && pf > pc)}
+    ${lado(f, m.foraRotulo, "fora", temPlacar && pf > pc)}
   </div>`;
 }
 
@@ -665,16 +728,19 @@ function viewPartida(){
   const m = jogos().find(x => chaveJogo(x) === telaJogo);
   if (!m) return `<div class="vazio"><p>Esta partida não está mais na tabela.</p></div>`;
   const c = timeDe(m.casa), f = timeDe(m.fora);
-  if (!c || !f) return `<div class="vazio"><p>Partida com time desconhecido.</p></div>`;
-
   const fim = encerrado(m);
   const [pc, pf] = placar(m);
   const temPlacar = pc != null && pf != null;
 
-  const eq = t => `<div class="eq">
-      <img class="esc-link" data-time="${t.id}" src="${escudo(t.id)}" alt="Escudo do ${esc(t.nome)}" width="58" height="58">
-      <div><div class="nm">${esc(t.nome)}</div><div class="tn">${esc(t.turma)}</div></div>
-    </div>`;
+  const eq = (t, rotulo) => t
+    ? `<div class="eq">
+        <img class="esc-link" data-time="${t.id}" src="${escudo(t.id)}" alt="Escudo do ${esc(t.nome)}" width="58" height="58">
+        <div><div class="nm">${esc(t.nome)}</div><div class="tn">${esc(t.turma)}</div></div>
+      </div>`
+    : `<div class="eq indef">
+        <span class="sem-escudo grande"></span>
+        <div><div class="nm">${esc(rotulo || "A definir")}</div></div>
+      </div>`;
 
   const etiqueta = fim ? `<span class="et">Encerrado</span>`
     : `<span class="et">${esc(rotuloDia(chaveDia(m.dataHora)))}</span>`;
@@ -701,18 +767,20 @@ function viewPartida(){
     listaGols = `<div class="vazio" style="padding:26px 10px"><p>Jogo sem gols.</p></div>`;
   } else if (temPlacar){
     listaGols = `<div class="vazio" style="padding:26px 10px"><p>Os autores dos gols ainda não foram lançados.</p></div>`;
+  } else if (!c || !f){
+    listaGols = `<div class="vazio" style="padding:26px 10px"><p>O confronto depende da classificação.</p><p>Assim que os times forem definidos, eles aparecem aqui.</p></div>`;
   } else {
     listaGols = `<div class="vazio" style="padding:26px 10px"><p>A partida ainda não começou.</p><p>Os gols aparecem aqui assim que forem marcados.</p></div>`;
   }
 
   return `${btnVoltar("Voltar")}
     <div class="placar">
-      ${eq(c)}
+      ${eq(c, m.casaRotulo)}
       <div class="meio">
         <div class="pl ${temPlacar ? "" : "pend"}">${temPlacar ? `${pc} - ${pf}` : esc(hora(m.dataHora))}</div>
         ${etiqueta}
       </div>
-      ${eq(f)}
+      ${eq(f, m.foraRotulo)}
     </div>
     <div class="ficha">${ficha.map(x => `<span>${esc(x)}</span>`).join("")}</div>
     ${faixaSimulacao()}
@@ -794,17 +862,17 @@ function viewClassificacao(){
       </tr></thead><tbody>`;
     linhas.forEach((l, i) => {
       const fav = l.time.id === favorita;
-      const passa = i < CLASSIFICAM_POR_GRUPO;
+      const d = destino(i);
       html += `<tr class="${fav ? "fav" : ""}">
         <td>
           <button class="ir-time" data-id="${l.time.id}" style="all:unset;cursor:pointer;display:block">
             <span class="linha-time">
-              <span class="rule ${passa ? "passa" : ""}"></span>
+              <span class="rule ${d ? d.cls : ""}"></span>
               <span class="pos">${i+1}</span>
               <img src="${escudo(l.time.id)}" alt="" width="26" height="26">
               <span class="txt">
                 <span class="nm">${esc(l.time.nome)}</span>
-                <span class="sub">${esc(l.time.turma)}</span>
+                <span class="sub">${esc(l.time.turma)}${d ? ` · <b class="${d.cls}">${d.txt}</b>` : ""}</span>
               </span>
             </span>
           </button>
@@ -817,28 +885,82 @@ function viewClassificacao(){
     html += `</tbody></table>`;
   });
 
-  html += `<div class="legenda"><i></i> Classificado para o mata-mata</div>
-    <div class="aviso"><span>Marcados <b>${CLASSIFICAM_POR_GRUPO} classificados por grupo</b> e desempate por pontos, vitórias, saldo e gols pró. Os dois ajustes saem do regulamento da copa.</span></div>`;
+  html += `<div class="legenda"><i class="direto"></i> Vai direto à semifinal <i class="repesca" style="margin-left:10px"></i> Passa pela repescagem</div>
+    <div class="aviso"><span>Desempate por pontos, vitórias, saldo de gols e gols pró. O 4º de cada grupo está eliminado.</span></div>`;
   return html;
 }
 
+/* Chave em árvore: os confrontos mais distantes nas pontas e a final no
+   meio, que é como se lê um mata-mata de olho. A ordem vertical segue o
+   caminho real — Repescagem 1 alimenta a Semifinal 1, e assim por diante. */
+
+const TROFEU = `<svg class="trofeu" viewBox="0 0 24 28" aria-hidden="true">
+  <path d="M7 2h10v7a5 5 0 0 1-10 0z"/>
+  <path d="M7 4H4v2a4 4 0 0 0 3 3.8M17 4h3v2a4 4 0 0 1-3 3.8"/>
+  <path d="M12 14v5M8.5 22h7l1 4h-9z"/>
+</svg>`;
+
+/* "2º do Grupo B" não cabe num cartão de 78px: encurta para "2º Gr. B" */
+const criterioCurto = t => !t ? "A definir" : t
+  .replace("do Grupo", "Gr.")
+  .replace("Vencedor da", "Venc.")
+  .replace("Repescagem", "Rep.")
+  .replace("Semifinal", "Semi");
+
+function cartaoChave(m, grande){
+  const c = timeDe(m.casa), f = timeDe(m.fora);
+  const fim = encerrado(m);
+  const [pc, pf] = placar(m);
+  const tem = pc != null && pf != null;
+
+  const eq = (t, rotulo) => t
+    ? `<span class="cc-eq"><img src="${escudo(t.id)}" alt="" width="34" height="34">
+        <span class="cc-tn">${esc(t.turma)}</span></span>`
+    : `<span class="cc-eq indef"><span class="sem-escudo"></span>
+        <span class="cc-tn">${esc(criterioCurto(rotulo))}</span></span>`;
+
+  const meio = tem
+    ? `<span class="cc-placar">${pc} - ${pf}</span>`
+    : (grande ? TROFEU : `<span class="cc-vs">×</span>`);
+
+  return `<div class="cc${grande ? " grande" : ""}${m.fase === "repescagem" ? " repesca" : ""}"
+       role="button" tabindex="0" data-jogo="${esc(chaveJogo(m))}">
+    <div class="cc-hora">${fim ? "Encerrado" : esc(hora(m.dataHora))}</div>
+    <div class="cc-times">
+      ${eq(c, m.casaRotulo)}
+      <span class="cc-meio">${meio}</span>
+      ${eq(f, m.foraRotulo)}
+    </div>
+    <div class="cc-base">${esc(m.local || "")}</div>
+  </div>`;
+}
+
 function viewMataMata(lista){
-  const fases = ["quartas","semi","final","terceiro"];
-  const daFase = ordenadas(lista).filter(m => fases.includes(m.fase));
-  if (!daFase.length){
+  const daFase = f => ordenadas(lista).filter(m => m.fase === f);
+  const reps = daFase("repescagem"), semis = daFase("semi"), finais = daFase("final");
+
+  if (!reps.length && !semis.length && !finais.length){
     return `<div class="vazio">
       <span class="glyph">Ainda não definido</span>
       <p>O mata-mata começa quando a fase de grupos terminar.</p>
-      <p>Quantas turmas avançam e o formato dos confrontos dependem do regulamento da copa.</p>
+      <p>1º de cada grupo vai direto à semifinal; 2º e 3º passam pela repescagem.</p>
     </div>`;
   }
-  let html = "";
-  fases.forEach(f => {
-    const desta = daFase.filter(m => m.fase === f);
-    if (!desta.length) return;
-    html += `<div class="rodada">${esc(faseNome(f))}</div><div class="lista">${desta.map(linhaJogo).join("")}</div>`;
-  });
-  return html;
+
+  /* de cima para baixo: ponta, semi, final, semi, ponta */
+  const degraus = [
+    reps[0]   && {rot:"Repescagem 1", m:reps[0],   cls:"repesca"},
+    semis[0]  && {rot:"Semifinal 1",  m:semis[0]},
+    finais[0] && {rot:"Final",        m:finais[0], cls:"grande", grande:true},
+    semis[1]  && {rot:"Semifinal 2",  m:semis[1]},
+    reps[1]   && {rot:"Repescagem 2", m:reps[1],   cls:"repesca"},
+  ].filter(Boolean);
+
+  return `<div class="chave">` + degraus.map((d, i) =>
+    `${i ? `<div class="conector"></div>` : ""}
+     <div class="chave-rot ${d.cls || ""}">${esc(d.rot)}</div>
+     ${cartaoChave(d.m, d.grande)}`
+  ).join("") + `</div>`;
 }
 
 function viewEdicaoAntiga(ano){
@@ -986,7 +1108,7 @@ document.getElementById("main").addEventListener("click", ev => {
   const seg = ev.target.closest(".seg");
   if (seg){ faseView = seg.dataset.fase; render(); return; }
 
-  const linha = ev.target.closest(".jogo");
+  const linha = ev.target.closest(".jogo, .cc");
   if (linha){ navegar({telaJogo: linha.dataset.jogo}); return; }
 
   const irTime = ev.target.closest(".ir-time");
@@ -1002,7 +1124,7 @@ document.getElementById("main").addEventListener("click", ev => {
 /* teclado: a linha do jogo é um botão */
 document.getElementById("main").addEventListener("keydown", ev => {
   if (ev.key !== "Enter" && ev.key !== " ") return;
-  const linha = ev.target.closest(".jogo");
+  const linha = ev.target.closest(".jogo, .cc");
   if (!linha) return;
   ev.preventDefault();
   navegar({telaJogo: linha.dataset.jogo});
