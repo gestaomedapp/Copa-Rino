@@ -587,6 +587,18 @@ const TIMES = [
    bio:"Medicina Unicesumar T24"},
 ];
 
+/* Elencos informados pelas turmas. Só entram aqui os times que
+   mandaram a lista — os outros seguem com o campo livre, e no admin
+   sempre existe a opção de digitar um nome que não está na lista. */
+const ELENCO_FIXO = {
+  /* T21 — elenco divulgado pela turma. Sem posição por enquanto:
+     a ordem segue o cartaz (goleiro, zaga, meias, alas, ataque). */
+  t21: [
+    "Misturinha", "Rafael", "Henrique", "Sakuma", "Fedrizze", "Jotave",
+    "Endryo", "Ryan", "Tonon", "Bazon", "Pep",
+  ],
+};
+
 /* Reconstituído pelas bios das turmas no Instagram — não confirmado
    pela organização. null = a confirmar. */
 const HALL = [
@@ -1441,7 +1453,13 @@ function viewAdminJogo(){
       </div>`
     : `<div class="lado-edit" style="align-self:stretch">${seletor(lado, null, rotulo)}</div>`;
 
-  const nomesDoTime = id => (ELENCOS[id] || []);
+  /* lista do time: primeiro o elenco informado pela turma, depois
+     os nomes que já apareceram em gols lançados (sem repetir) */
+  const nomesDoTime = id => {
+    const fixo = ELENCO_FIXO[id] || [];
+    const usados = (ELENCOS[id] || []).filter(n => !fixo.includes(n));
+    return fixo.concat(usados);
+  };
 
   let html = cabecalhoAdmin(m.fase === "grupos" ? "Rodada " + m.rodada : faseNome(m.fase));
   html += `<button class="voltar" id="adm-voltar"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>Todos os jogos</button>
@@ -1451,12 +1469,10 @@ function viewAdminJogo(){
     </div>`;
 
   if (c && f){
-    html += `<div class="campo"><label>Situação</label>
-      <div class="alternar">
-        <button data-adm-status="agendado" aria-pressed="${!fim}">Ainda vai jogar</button>
-        <button data-adm-status="encerrado" aria-pressed="${fim}">Jogo encerrado</button>
-      </div>
-      <span class="dica">O placar só aparece no app depois de marcar como encerrado.</span></div>
+    html += `<p class="campo dica" style="margin-top:12px;text-align:center">
+        O placar entra no app assim que você mexer no + ou no − — ou lançar um gol abaixo.${
+        fim ? " Este jogo já está publicado como encerrado." : ""}
+      </p>
 
       <div class="rodada" style="margin-top:22px">Gols</div>
       ${gols.length ? gols.map((g, i) => {
@@ -1469,15 +1485,26 @@ function viewAdminJogo(){
         </div>`;
       }).join("") : `<p class="campo dica" style="margin-top:8px">Nenhum gol lançado. Se não quiser registrar quem marcou, basta usar os botões de + e − no placar.</p>`}
 
-      ${[["casa", c], ["fora", f]].map(([lado, t]) => `
-        <div class="campo">
+      ${[["casa", c], ["fora", f]].map(([lado, t]) => {
+        const nomes = nomesDoTime(t.id);
+        /* com elenco: lista suspensa, e "Outro" abre o campo de digitar —
+           jogador não cadastrado nunca fica de fora.
+           sem elenco: campo livre, como antes. */
+        const entrada = nomes.length
+          ? `<select id="adm-sel-${lado}" data-adm-sel="${lado}">
+               <option value="">— quem marcou —</option>
+               ${nomes.map(n => `<option value="${esc(n)}">${esc(n)}</option>`).join("")}
+               <option value="__outro__">Outro — digitar o nome</option>
+             </select>
+             <input id="adm-nome-${lado}" placeholder="Nome do jogador"
+                    style="margin-top:8px" autocapitalize="words" hidden>`
+          : `<input id="adm-nome-${lado}" placeholder="Quem marcou" autocapitalize="words">`;
+        return `<div class="campo">
           <label>Gol do ${esc(t.nome)}</label>
-          <input id="adm-nome-${lado}" placeholder="Quem marcou" list="nomes-${lado}" autocapitalize="words">
-          <datalist id="nomes-${lado}">${nomesDoTime(t.id).map(n => `<option value="${esc(n)}"></option>`).join("")}</datalist>
-          ${nomesDoTime(t.id).length ? `<div class="chips">${nomesDoTime(t.id).slice(0, 8).map(n =>
-            `<button class="chip" data-adm-chip="${lado}" data-nome="${esc(n)}">${esc(n)}</button>`).join("")}</div>` : ""}
+          ${entrada}
           <button class="btn secundario" data-adm-add="${lado}" style="margin-top:10px">Adicionar gol</button>
-        </div>`).join("")}
+        </div>`;
+      }).join("")}
 
       ${gols.length > gc + gf ? `<div class="aviso-adm">Há mais gols lançados do que o placar indica. O placar manda: confira os números acima.</div>` : ""}
 
@@ -1586,30 +1613,19 @@ function ligarAdmin(){
       render(); return;
     }
 
-    const est = ev.target.closest("[data-adm-status]");
-    if (est){
-      m.status = est.dataset.admStatus;
-      if (m.status === "encerrado") numerar();
-      render(); return;
-    }
-
-    const chip = ev.target.closest("[data-adm-chip]");
-    if (chip){
-      const campo = document.getElementById("adm-nome-" + chip.dataset.admChip);
-      if (campo) campo.value = chip.dataset.nome;
-      return;
-    }
-
     const add = ev.target.closest("[data-adm-add]");
     if (add){
       const lado = add.dataset.admAdd;
+      const sel = document.getElementById("adm-sel-" + lado);
       const campo = document.getElementById("adm-nome-" + lado);
-      const nome = (campo.value || "").trim();
-      if (!nome){ campo.focus(); return; }
+      /* nome escolhido na lista; em "Outro", o que foi digitado */
+      const daLista = sel && sel.value && sel.value !== "__outro__" ? sel.value : "";
+      const nome = daLista || (campo && campo.value || "").trim();
+      if (!nome){ (sel && !sel.value ? sel : campo).focus(); return; }
       numerar();
       m.gols = Array.isArray(m.gols) ? m.gols : [];
       m.gols.push({time: lado === "casa" ? m.casa : m.fora, jogador: nome});
-      campo.value = "";
+      if (campo) campo.value = "";
       const alvo = lado === "casa" ? "golsCasa" : "golsFora";
       m[alvo] = (Number(m[alvo]) || 0) + 1;
       if (m.status !== "encerrado") m.status = "encerrado";
@@ -1633,6 +1649,20 @@ function ligarAdmin(){
 
   main.addEventListener("change", ev => {
     if (!modoAdmin) return;
+
+    /* "Outro" revela o campo livre sem redesenhar a tela — um render
+       aqui apagaria a escolha que a pessoa acabou de fazer */
+    const quem = ev.target.closest("[data-adm-sel]");
+    if (quem){
+      const campo = document.getElementById("adm-nome-" + quem.dataset.admSel);
+      if (campo){
+        const outro = quem.value === "__outro__";
+        campo.hidden = !outro;
+        if (outro) campo.focus(); else campo.value = "";
+      }
+      return;
+    }
+
     const sel = ev.target.closest("[data-adm-time]");
     if (!sel) return;
     const m = jogos().find(x => chaveJogo(x) === admJogo);
