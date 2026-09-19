@@ -1,7 +1,7 @@
 {
   "_leiame": "Partidas da Copa Rino 2026 — domingo 20/09, tudo em um dia, 3 campos em paralelo. Para lancar um resultado: mude 'status' para 'encerrado' e preencha golsCasa/golsFora. Enquanto o status nao for 'encerrado' o app NAO mostra placar nenhum. Nos jogos do mata-mata, troque casa/fora de null pelo id do time quando ele for definido (casaRotulo/foraRotulo sao so o texto mostrado enquanto o confronto nao existe). Ids: t15 Renal Madrid, t18 Botafofo, t19 Borussia Doctors, t20 MilanB, t21 Ozempic de Marseille, t23 Real Diabetis, t24 Liverpulmonar, t25 Bayern Pneumunique. Em 'gols', 'time' e o id de quem marcou; 'assistencia' e 'contra' sao opcionais. O campo 'elencos' guarda os nomes ja usados por time; a tela de admin preenche sozinha.",
   "edicao": 2026,
-  "atualizadoEm": "2026-09-19T21:39:33.731Z",
+  "atualizadoEm": "2026-09-19T21:39:51.615Z",
   "elencos": {
     "t21": [
       "Henrique",
@@ -55,10 +55,10 @@
       "rodada": 2,
       "casa": "t18",
       "fora": "t24",
-      "golsCasa": null,
-      "golsFora": null,
+      "golsCasa": 1,
+      "golsFora": 0,
       "gols": [],
-      "status": "agendado",
+      "status": "encerrado",
       "dataHora": "2026-09-20T09:50:00-03:00",
       "local": "Campo 1"
     },
