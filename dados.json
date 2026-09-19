@@ -1,8 +1,13 @@
 {
   "_leiame": "Partidas da Copa Rino 2026 — domingo 20/09, tudo em um dia, 3 campos em paralelo. Para lancar um resultado: mude 'status' para 'encerrado' e preencha golsCasa/golsFora. Enquanto o status nao for 'encerrado' o app NAO mostra placar nenhum. Nos jogos do mata-mata, troque casa/fora de null pelo id do time quando ele for definido (casaRotulo/foraRotulo sao so o texto mostrado enquanto o confronto nao existe). Ids: t15 Renal Madrid, t18 Botafofo, t19 Borussia Doctors, t20 MilanB, t21 Ozempic de Marseille, t23 Real Diabetis, t24 Liverpulmonar, t25 Bayern Pneumunique. Em 'gols', 'time' e o id de quem marcou; 'assistencia' e 'contra' sao opcionais. O campo 'elencos' guarda os nomes ja usados por time; a tela de admin preenche sozinha.",
   "edicao": 2026,
-  "atualizadoEm": null,
-  "elencos": {},
+  "atualizadoEm": "2026-09-19T18:20:41.227Z",
+  "elencos": {
+    "t21": [
+      "Henrique",
+      "Sakuma"
+    ]
+  },
   "partidas": [
     {
       "id": "g1c1",
@@ -23,10 +28,19 @@
       "rodada": 1,
       "casa": "t21",
       "fora": "t23",
-      "golsCasa": null,
-      "golsFora": null,
-      "gols": [],
-      "status": "agendado",
+      "golsCasa": 2,
+      "golsFora": 0,
+      "gols": [
+        {
+          "time": "t21",
+          "jogador": "Henrique"
+        },
+        {
+          "time": "t21",
+          "jogador": "Sakuma"
+        }
+      ],
+      "status": "encerrado",
       "dataHora": "2026-09-20T09:00:00-03:00",
       "local": "Campo 2"
     },
