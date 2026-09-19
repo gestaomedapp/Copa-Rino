@@ -1678,8 +1678,7 @@ function viewAdminJogo(){
 
   if (c && f){
     html += `<p class="campo dica" style="margin-top:12px;text-align:center">
-        O placar entra no app assim que você mexer no + ou no − — ou lançar um gol abaixo.${
-        fim ? " Este jogo já está publicado como encerrado." : ""}
+        ${fim ? "Publicado como encerrado." : "O placar entra no app assim que você mexer no + ou no −, ou lançar um gol abaixo."}
       </p>
 
       <div class="rodada" style="margin-top:22px">Gols</div>
@@ -1716,7 +1715,9 @@ function viewAdminJogo(){
 
       ${gols.length > gc + gf ? `<div class="aviso-adm">Há mais gols lançados do que o placar indica. O placar manda: confira os números acima.</div>` : ""}
 
-      <button class="btn" id="adm-salvar" ${admSalvando ? "disabled" : ""}>${admSalvando ? "Salvando…" : "Salvar no app"}</button>`;
+      <button class="btn" id="adm-salvar" ${admSalvando ? "disabled" : ""}>${admSalvando ? "Salvando…" : "Salvar no app"}</button>
+      ${fim || m.golsCasa != null || m.golsFora != null || gols.length
+        ? `<button class="btn secundario" id="adm-reabrir">Voltar para "ainda vai jogar"</button>` : ""}`;
   } else {
     html += `<div class="aviso-adm">Escolha os dois times deste confronto para poder lançar o placar.</div>
       <button class="btn" id="adm-salvar" ${admSalvando ? "disabled" : ""}>${admSalvando ? "Salvando…" : "Salvar times"}</button>`;
@@ -1744,8 +1745,13 @@ async function admSalvar(){
 
     alvo.casa = m.casa; alvo.fora = m.fora;
     alvo.status = m.status;
-    alvo.golsCasa = m.golsCasa; alvo.golsFora = m.golsFora;
     alvo.gols = Array.isArray(m.gols) ? m.gols : [];
+    /* jogo devolvido para a agenda vai sem placar nenhum */
+    if (m.status === "agendado"){
+      alvo.golsCasa = null; alvo.golsFora = null; alvo.gols = [];
+    } else {
+      alvo.golsCasa = m.golsCasa; alvo.golsFora = m.golsFora;
+    }
 
     /* guarda os nomes já usados para virarem atalho da próxima vez */
     doc.elencos = doc.elencos || {};
@@ -1757,8 +1763,9 @@ async function admSalvar(){
     doc.atualizadoEm = new Date().toISOString();
 
     const c = timeDe(alvo.casa), f = timeDe(alvo.fora);
-    await gravarRemoto(doc, sha,
-      `Resultado: ${c ? c.turma : "?"} ${alvo.golsCasa ?? "-"} x ${alvo.golsFora ?? "-"} ${f ? f.turma : "?"}`);
+    await gravarRemoto(doc, sha, alvo.status === "agendado"
+      ? `Reabre: ${c ? c.turma : "?"} x ${f ? f.turma : "?"} volta para a agenda`
+      : `Resultado: ${c ? c.turma : "?"} ${alvo.golsCasa ?? "-"} x ${alvo.golsFora ?? "-"} ${f ? f.turma : "?"}`);
 
     ELENCOS = doc.elencos;
     admAviso = {tipo:"ok", texto:"<b>Salvo.</b> O GitHub republica em cerca de um minuto e o app de todo mundo se atualiza sozinho."};
@@ -1818,6 +1825,15 @@ function ligarAdmin(){
         if (i >= 0 && (m.gols.filter(g => g.time === idTime).length > m[campo])) m.gols.splice(i, 1);
       }
       if (m.golsCasa != null && m.golsFora != null && m.status !== "encerrado") m.status = "encerrado";
+      render(); return;
+    }
+
+    /* desfazer: o jogo volta a ser um jogo por vir — placar e gols saem
+       juntos, senão sobrariam gols órfãos contando na artilharia */
+    if (ev.target.closest("#adm-reabrir")){
+      m.status = "agendado";
+      m.golsCasa = null; m.golsFora = null; m.gols = [];
+      admAviso = {tipo:"ok", texto:"Placar e gols apagados. Toque em <b>Salvar no app</b> para publicar."};
       render(); return;
     }
 
@@ -1940,8 +1956,12 @@ render();
     } catch (e) {}
   }
   lerArquivo();
-  setInterval(() => { if (!document.hidden) lerArquivo(); }, 30000);
-  document.addEventListener("visibilitychange", () => { if (!document.hidden) lerArquivo(); });
+  /* enquanto a tela de administração está aberta a releitura fica parada:
+     senão, a cada 30 segundos o arquivo sobrescreveria o lançamento que
+     ainda está sendo digitado */
+  const podeReler = () => !document.hidden && !modoAdmin;
+  setInterval(() => { if (podeReler()) lerArquivo(); }, 30000);
+  document.addEventListener("visibilitychange", () => { if (podeReler()) lerArquivo(); });
 })();
 </script>
 
