@@ -1823,9 +1823,34 @@ const cabecalhoAdmin = (titulo) => `<div class="adm-topo">
     <button class="adm-acao" id="adm-fechar">Sair</button>
   </div>`;
 
+/* Casa cada jogo CRU com a sua versão resolvida (times já deduzidos do
+   rótulo). O admin edita o objeto cru no lugar, então aqui só se olha
+   para a versão resolvida — nada é trocado por baixo. */
+function resolvidosPorOrigem(){
+  const ch = chaveResolvida(jogos());
+  const mapa = new Map();
+  if (!ch.esqueleto) [...ch.reps, ...ch.semis, ...ch.finais]
+    .forEach(x => { if (x.origem) mapa.set(x.origem, x); });
+  return mapa;
+}
+
+/* Preenche os times de um jogo de mata-mata que ainda está em branco,
+   mas SÓ quando a vaga já é definitiva: prévia não pode virar confronto
+   gravado, senão um resultado de última rodada deixaria o dados.json com
+   o confronto errado. Fica marcado com "auto" para a tela avisar que
+   ainda falta salvar. */
+function admPreencher(m){
+  if (!m || m.fase === "grupos" || (m.casa && m.fora)) return;
+  const r = resolvidosPorOrigem().get(m);
+  if (!r) return;
+  if (!m.casa && r.casa && !r.previaCasa){ m.casa = r.casa; m.auto = true; }
+  if (!m.fora && r.fora && !r.previaFora){ m.fora = r.fora; m.auto = true; }
+}
+
 /* ---------- lista de jogos ---------- */
 function viewAdminLista(){
   const lista = ordenadas(jogos());
+  const resolvidos = resolvidosPorOrigem();
   let html = cabecalhoAdmin("Lançar resultados");
   if (admAviso) html += `<div class="aviso-adm ${admAviso.tipo}">${admAviso.texto}</div>`;
 
@@ -1833,11 +1858,15 @@ function viewAdminLista(){
   lista.forEach(m => {
     const rot = m.fase === "grupos" ? "Rodada " + (m.rodada || "?") : faseNome(m.fase);
     if (rot !== faseAtual){ faseAtual = rot; html += `<div class="rodada">${esc(rot)}</div>`; }
-    const c = timeDe(m.casa), f = timeDe(m.fora);
+    /* o jogo continua sendo o cru; só os NOMES vêm da versão resolvida */
+    const r = resolvidos.get(m) || m;
+    const c = timeDe(r.casa), f = timeDe(r.fora);
     const [pc, pf] = placar(m);
-    const nome = t => t ? t.turma : "?";
+    const nome = (t, rotulo, previa) => t
+      ? esc(t.turma) + (previa ? ` <span class="quando">(prévia)</span>` : "")
+      : esc(criterioCurto(rotulo) || "?");
     html += `<button class="adm-item" data-adm-jogo="${esc(chaveJogo(m))}">
-      <span class="quem">${nome(c)} × ${nome(f)}
+      <span class="quem">${nome(c, m.casaRotulo, r.previaCasa)} × ${nome(f, m.foraRotulo, r.previaFora)}
         <span class="quando" style="display:block">${esc(hora(m.dataHora))} · ${esc(m.local || "")}</span></span>
       <span class="est ${encerrado(m) ? "pronto" : "aberto"}">${
         encerrado(m) ? `${pc}-${pf}` : "a jogar"}</span>
@@ -1851,6 +1880,7 @@ function viewAdminLista(){
 function viewAdminJogo(){
   const m = jogos().find(x => chaveJogo(x) === admJogo);
   if (!m) return viewAdminLista();
+  admPreencher(m);   // mata-mata: puxa os times que a classificação já define
   const c = timeDe(m.casa), f = timeDe(m.fora);
   const gols = Array.isArray(m.gols) ? m.gols : [];
   const gc = Number(m.golsCasa) || 0, gf = Number(m.golsFora) || 0;
@@ -1863,15 +1893,18 @@ function viewAdminJogo(){
         ${TIMES.map(t => `<option value="${t.id}" ${t.id === atual ? "selected" : ""}>${esc(t.turma)} · ${esc(t.nome)}</option>`).join("")}
       </select></label>`;
 
+  /* o placar só aparece com os DOIS lados definidos: meio confronto não
+     tem placar para lançar, e o stepper sozinho só confunde */
+  const completo = !!(c && f);
   const ladoEdit = (t, lado, rotulo, n) => t
     ? `<div class="lado-edit">
         <img src="${escudo(t.id)}" alt="" width="46" height="46">
         <div class="nm">${esc(t.nome)}</div>
-        <div class="stepper">
+        ${completo ? `<div class="stepper">
           <button data-adm-gol="-${lado}" aria-label="Tirar um gol">−</button>
           <span class="n">${n}</span>
           <button data-adm-gol="+${lado}" aria-label="Somar um gol">+</button>
-        </div>
+        </div>` : ""}
       </div>`
     : `<div class="lado-edit" style="align-self:stretch">${seletor(lado, null, rotulo)}</div>`;
 
@@ -1889,6 +1922,10 @@ function viewAdminJogo(){
       ${ladoEdit(c, "casa", criterioCurto(m.casaRotulo), gc)}
       ${ladoEdit(f, "fora", criterioCurto(m.foraRotulo), gf)}
     </div>`;
+
+  if (m.auto && completo){
+    html += `<div class="aviso-adm">Confronto puxado da classificação. Confira e toque em <b>Salvar</b> para gravar — enquanto não salvar, ele continua sendo calculado na hora.</div>`;
+  }
 
   if (c && f){
     html += `<p class="campo dica" style="margin-top:12px;text-align:center">
@@ -1933,7 +1970,11 @@ function viewAdminJogo(){
       ${fim || m.golsCasa != null || m.golsFora != null || gols.length
         ? `<button class="btn secundario" id="adm-reabrir">Voltar para "ainda vai jogar"</button>` : ""}`;
   } else {
-    html += `<div class="aviso-adm">Escolha os dois times deste confronto para poder lançar o placar.</div>
+    const r = resolvidosPorOrigem().get(m) || {};
+    const pendente = (!m.casa && r.previaCasa) || (!m.fora && r.previaFora);
+    html += `<div class="aviso-adm">${pendente
+      ? "A fase de grupos ainda não acabou, então este confronto é só prévia — por isso não foi preenchido sozinho. Dá para escolher na mão agora, ou esperar a última rodada."
+      : "Este lado depende de um jogo que ainda não foi disputado. Assim que o vencedor sair, o confronto se preenche sozinho."}</div>
       <button class="btn" id="adm-salvar" ${admSalvando ? "disabled" : ""}>${admSalvando ? "Salvando…" : "Salvar times"}</button>`;
   }
 
