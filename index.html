@@ -800,6 +800,7 @@ let modoAdmin = false;
 let admJogo = null;      // id do jogo aberto para edição
 let admAviso = null;     // {tipo, texto}
 let admSalvando = false;
+let admConfirmaLimpar = false;   // "Limpar o mata-mata" pede dois toques
 
 try { favorita = localStorage.getItem(CHAVE) || null; } catch (e) {}
 if (favorita && !timeDe(favorita)) favorita = null;
@@ -971,6 +972,11 @@ function chaveResolvida(lista){
      está em branco. Assim, lançar o confronto no admin trava a vaga. */
   const lado = (id, rotulo) => {
     if (id) return {id, previa:false};
+    /* com a tabela zerada não há o que deduzir: a classificação sairia na
+       ordem alfabética das turmas e a chave mostraria um confronto
+       inventado. Vaga de vencedor continua valendo — ela não depende da
+       tabela. */
+    if (!jogados && rotuloDeGrupo(rotulo)) return {id:null, previa:false};
     const achado = vagaDoRotulo(rotulo, ctx);
     if (!achado) return {id:null, previa:false};
     /* vaga vinda da classificação só é definitiva com a fase de grupos
@@ -998,7 +1004,10 @@ function chaveResolvida(lista){
   ctx.vencedorSemi = S.map(vencedorDe);
   const F = finais.map(resolver);
 
-  return {reps:R, semis:S, finais:F, faltam, jogados, esqueleto};
+  const previas = [...R, ...S, ...F]
+    .reduce((n, m) => n + (m.previaCasa ? 1 : 0) + (m.previaFora ? 1 : 0), 0);
+
+  return {reps:R, semis:S, finais:F, faltam, jogados, esqueleto, previas};
 }
 
 /* Lista que as telas usam: a mesma de jogos(), com as vagas do mata-mata
@@ -1437,6 +1446,9 @@ function viewMataMata(){
 
   /* sem nenhum jogo de grupo lançado não há o que prever: a classificação
      estaria zerada e a chave sairia na ordem alfabética das turmas */
+  /* só vale para a chave montada pelo formato: quando os confrontos estão
+     cadastrados de verdade, a árvore aparece com os rótulos e os horários
+     mesmo antes de a fase de grupos começar */
   if (ch.esqueleto && !ch.jogados){
     return `<div class="vazio">
       <span class="glyph">Ainda não definido</span>
@@ -1460,7 +1472,7 @@ function viewMataMata(){
      ${cartaoChave(d.m, d.grande)}`
   ).join("") + `</div>`;
 
-  return faixaSimulacao() + faixaPrevia(ch.faltam) + arvore
+  return faixaSimulacao() + (ch.previas ? faixaPrevia(ch.faltam) : "") + arvore
     + (ch.esqueleto ? `<div class="aviso"><span>Os jogos do mata-mata ainda não foram cadastrados. Esta chave é montada pelo <b>formato da copa</b> — horário e quadra entram quando a organização lançar os confrontos.</span></div>` : "")
     + (ch.faltam === 0 ? `<div class="aviso"><span><b>Fase de grupos encerrada.</b> As vagas de 1º, 2º e 3º já estão definidas.</span></div>` : "");
 }
@@ -1843,8 +1855,8 @@ function admPreencher(m){
   if (!m || m.fase === "grupos" || (m.casa && m.fora)) return;
   const r = resolvidosPorOrigem().get(m);
   if (!r) return;
-  if (!m.casa && r.casa && !r.previaCasa){ m.casa = r.casa; m.auto = true; }
-  if (!m.fora && r.fora && !r.previaFora){ m.fora = r.fora; m.auto = true; }
+  if (!m.casa && r.casa && !r.previaCasa){ m.casa = r.casa; m.autoCasa = true; }
+  if (!m.fora && r.fora && !r.previaFora){ m.fora = r.fora; m.autoFora = true; }
 }
 
 /* ---------- lista de jogos ---------- */
@@ -1872,8 +1884,58 @@ function viewAdminLista(){
         encerrado(m) ? `${pc}-${pf}` : "a jogar"}</span>
     </button>`;
   });
+  /* Atalho de manutenção: devolve todos os jogos do mata-mata ao cálculo.
+     Serve para desfazer confrontos que ficaram gravados no arquivo e para
+     zerar a chave depois de um teste. */
+  const temMata = lista.some(m => m.fase !== "grupos" &&
+    (m.casa || m.fora || encerrado(m)));
+  if (temMata){
+    html += `<button class="btn secundario" id="adm-limpar" ${admSalvando ? "disabled" : ""}
+      style="${admConfirmaLimpar ? "color:var(--red);border-color:var(--red)" : ""}">${
+      admSalvando ? "Limpando…"
+      : admConfirmaLimpar ? "Confirmar: apagar toda a chave?"
+      : "Limpar o mata-mata"}</button>`;
+    if (admConfirmaLimpar) html += `<p class="campo dica" style="text-align:center">Apaga times, placares e gols da repescagem, das semifinais e da final. A fase de grupos não é tocada. Depois disso a chave volta a ser calculada pela classificação.</p>`;
+  }
   html += `<button class="btn secundario" id="adm-config">Trocar o acesso do GitHub</button>`;
   return html;
+}
+
+/* ---------- limpar o mata-mata ---------- */
+async function admLimparMata(){
+  if (admSalvando) return;
+  admSalvando = true; admAviso = null; render();
+  try {
+    const {doc, sha} = await ghArquivo();
+    const sujo = p => p.fase !== "grupos" && (p.casa || p.fora ||
+      p.golsCasa != null || p.golsFora != null || (p.gols || []).length ||
+      p.status === "encerrado" || p.status === "wo");
+    const alvos = (doc.partidas || []).filter(sujo);
+    if (!alvos.length){
+      admAviso = {tipo:"ok", texto:"O mata-mata já estava limpo."};
+    } else {
+      alvos.forEach(p => {
+        p.casa = null; p.fora = null;
+        p.golsCasa = null; p.golsFora = null;
+        p.gols = []; p.status = "agendado";
+      });
+      doc.atualizadoEm = new Date().toISOString();
+      await gravarRemoto(doc, sha, "Limpa o mata-mata: a chave volta a ser calculada");
+      /* a releitura do arquivo fica parada enquanto o admin está aberto,
+         então a tela precisa ser zerada aqui também */
+      jogos().forEach(m => { if (sujo(m)){
+        m.casa = null; m.fora = null; m.golsCasa = null; m.golsFora = null;
+        m.gols = []; m.status = "agendado";
+        m.autoCasa = false; m.autoFora = false;
+      }});
+      admAviso = {tipo:"ok", texto:`<b>Mata-mata limpo.</b> ${alvos.length} ${
+        alvos.length === 1 ? "jogo voltou" : "jogos voltaram"} a ser calculado pela classificação.`};
+    }
+  } catch (e){
+    admAviso = {tipo:"erro", texto: esc(e.message || "Não consegui limpar.")};
+  }
+  admSalvando = false; admConfirmaLimpar = false; admJogo = null;
+  render();
 }
 
 /* ---------- edição de um jogo ---------- */
@@ -1923,8 +1985,8 @@ function viewAdminJogo(){
       ${ladoEdit(f, "fora", criterioCurto(m.foraRotulo), gf)}
     </div>`;
 
-  if (m.auto && completo){
-    html += `<div class="aviso-adm">Confronto puxado da classificação. Confira e toque em <b>Salvar</b> para gravar — enquanto não salvar, ele continua sendo calculado na hora.</div>`;
+  if ((m.autoCasa || m.autoFora) && completo){
+    html += `<div class="aviso-adm">Confronto <b>calculado pela classificação</b>, não gravado. Ele só vira fixo no arquivo quando o jogo tiver placar — até lá continua acompanhando a fase de grupos.</div>`;
   }
 
   if (c && f){
@@ -1998,7 +2060,15 @@ async function admSalvar(){
     const alvo = (doc.partidas || []).find(p => (p.id || chaveJogo(p)) === admJogo);
     if (!alvo) throw new Error("Esta partida não está no dados.json do repositório.");
 
-    alvo.casa = m.casa; alvo.fora = m.fora;
+    /* Um jogo de mata-mata SEM placar não guarda time: a vaga continua
+       sendo calculada pela classificação. Se gravasse, apagar um resultado
+       da fase de grupos deixaria o confronto velho preso no arquivo — foi
+       exatamente o que aconteceu na primeira versão do preenchimento
+       automático. Time escolhido na mão é uma decisão explícita e fica;
+       jogo já disputado fica também, porque aquele confronto aconteteu. */
+    const congelar = encerrado(m) || m.fase === "grupos";
+    alvo.casa = (!congelar && m.autoCasa) ? null : m.casa;
+    alvo.fora = (!congelar && m.autoFora) ? null : m.fora;
     alvo.status = m.status;
     alvo.gols = Array.isArray(m.gols) ? m.gols : [];
     /* jogo devolvido para a agenda vai sem placar nenhum */
@@ -2044,6 +2114,14 @@ function ligarAdmin(){
     if (ev.target.closest("#adm-config")){ admJogo = null; admAviso = null; ghGuardar({...ghConfig(), token:""}); render(); return; }
     if (ev.target.closest("#adm-sair")){ ghEsquecer(); admAviso = {tipo:"ok", texto:"Token apagado deste aparelho."}; render(); return; }
 
+    /* fica aqui em cima de propósito: mais abaixo o handler exige um jogo
+       aberto (admJogo) e sai fora — na tela de lista nunca chegaria */
+    if (ev.target.closest("#adm-limpar")){
+      if (!admConfirmaLimpar){ admConfirmaLimpar = true; admAviso = null; render(); }
+      else admLimparMata();
+      return;
+    }
+
     if (ev.target.closest("#adm-entrar")){
       const owner = document.getElementById("adm-owner").value.trim();
       const repo  = document.getElementById("adm-repo").value.trim();
@@ -2056,7 +2134,7 @@ function ligarAdmin(){
 
     const abrir = ev.target.closest("[data-adm-jogo]");
     if (abrir){ admJogo = abrir.dataset.admJogo; admAviso = null;
-      main.scrollTop = 0; render(); return; }
+      admConfirmaLimpar = false; main.scrollTop = 0; render(); return; }
 
     const m = jogos().find(x => chaveJogo(x) === admJogo);
     if (!m) return;
@@ -2088,6 +2166,11 @@ function ligarAdmin(){
     if (ev.target.closest("#adm-reabrir")){
       m.status = "agendado";
       m.golsCasa = null; m.golsFora = null; m.gols = [];
+      /* no mata-mata a vaga volta a ser calculada; se a classificação ainda
+         apontar os mesmos times, eles reaparecem — só que agora como conta,
+         não como registro gravado */
+      if (m.fase !== "grupos"){ m.casa = null; m.fora = null;
+        m.autoCasa = false; m.autoFora = false; }
       admAviso = {tipo:"ok", texto:"Placar e gols apagados. Toque em <b>Salvar no app</b> para publicar."};
       render(); return;
     }
