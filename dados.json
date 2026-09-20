@@ -1,7 +1,7 @@
 {
   "_leiame": "Partidas da Copa Rino 2026 — domingo 20/09, tudo em um dia, 3 campos em paralelo. Para lancar um resultado: mude 'status' para 'encerrado' e preencha golsCasa/golsFora. Enquanto o status nao for 'encerrado' o app NAO mostra placar nenhum. Nos jogos do mata-mata, troque casa/fora de null pelo id do time quando ele for definido (casaRotulo/foraRotulo sao so o texto mostrado enquanto o confronto nao existe). Ids: t15 Renal Madrid, t18 Botafofo, t19 Borussia Doctors, t20 MilanB, t21 Ozempic de Marseille, t23 Real Diabetis, t24 Liverpulmonar, t25 Bayern Pneumunique. Em 'gols', 'time' e o id de quem marcou; 'assistencia' e 'contra' sao opcionais. O campo 'elencos' guarda os nomes ja usados por time; a tela de admin preenche sozinha.",
   "edicao": 2026,
-  "atualizadoEm": "2026-09-19T23:19:50.049Z",
+  "atualizadoEm": "2026-09-20T00:26:57.381Z",
   "elencos": {
     "t21": [
       "Henrique",
@@ -169,8 +169,8 @@
     {
       "id": "rep1",
       "fase": "repescagem",
-      "casa": "null",
-      "fora": "null",
+      "casa": null,
+      "fora": null,
       "casaRotulo": "2º do Grupo B",
       "foraRotulo": "3º do Grupo A",
       "golsCasa": null,
@@ -183,8 +183,8 @@
     {
       "id": "rep2",
       "fase": "repescagem",
-      "casa": "null",
-      "fora": "null",
+      "casa": null,
+      "fora": null,
       "casaRotulo": "2º do Grupo A",
       "foraRotulo": "3º do Grupo B",
       "golsCasa": null,
@@ -197,8 +197,8 @@
     {
       "id": "semi1",
       "fase": "semi",
-      "casa": "null",
-      "fora": "null",
+      "casa": null,
+      "fora": null,
       "casaRotulo": "1º do Grupo A",
       "foraRotulo": "Vencedor da Repescagem 1",
       "golsCasa": null,
@@ -211,8 +211,8 @@
     {
       "id": "semi2",
       "fase": "semi",
-      "casa": "null",
-      "fora": "null",
+      "casa": null,
+      "fora": null,
       "casaRotulo": "1º do Grupo B",
       "foraRotulo": "Vencedor da Repescagem 2",
       "golsCasa": null,
@@ -225,8 +225,8 @@
     {
       "id": "final",
       "fase": "final",
-      "casa": "null",
-      "fora": "null",
+      "casa": null,
+      "fora": null,
       "casaRotulo": "Vencedor da Semifinal 1",
       "foraRotulo": "Vencedor da Semifinal 2",
       "golsCasa": null,
